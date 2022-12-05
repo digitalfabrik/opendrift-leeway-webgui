@@ -7,6 +7,7 @@ Use it with the docker container by mounting a directory and copying the file to
 """
 import argparse
 import uuid
+import os
 
 from datetime import datetime, timedelta
 
@@ -35,7 +36,6 @@ PARSER.add_argument('--id',
 ARGS = PARSER.parse_args()
 
 o = Leeway(loglevel=50)
-object_type = 26
 
 o.add_readers_from_list(['https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest',
                          'https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd'],
@@ -44,7 +44,12 @@ o.add_readers_from_list(['https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest',
 reader_landmask = reader_global_landmask.Reader(extent=[0, 0, 360, 90])
 o.add_reader([reader_landmask])
 
-o.seed_elements(lon=float(ARGS.longitude), lat=float(ARGS.latitude), time=datetime.strptime(ARGS.start_time, '%Y-%m-%d %H:%M'), number=100, radius=1000, object_type=ARGS.object_type)
+o.seed_elements(lon=float(ARGS.longitude),
+                lat=float(ARGS.latitude),
+                time=datetime.strptime(ARGS.start_time, '%Y-%m-%d %H:%M'),
+                number=100, radius=1000,
+                object_type=ARGS.object_type)
 
-o.run(duration=timedelta(hours=ARGS.duration), time_step=600)
-o.plot(fast=True, legend=True, filename="/code/leeway/{}.png".format(ARGS.id))
+o.run(duration=timedelta(hours=int(ARGS.duration)), time_step=600)
+
+o.plot(fast=True, legend=True, filename=os.path.join("/code", "leeway", ARGS.id))
