@@ -13,7 +13,7 @@ def run_leeway_simulation(request_id):
     simulation = LeewaySimulation.objects.get(uuid=request_id)
     simulation.simulation_started = datetime.now()
     simulation.save()
-    params = ["docker", "run", "-it", "--volume",
+    params = ["docker", "run", "--volume",
               "{}:/code/leeway".format(settings.SIMULATION_PATH),
               "opendrift/opendrift",
               "python3", "leeway/simulation.py",
