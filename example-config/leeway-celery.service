@@ -1,0 +1,14 @@
+# /etc/systemd/system/leeway-celery.service
+[Unit]
+Description=Celery worker for Leeway simulations
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/leeway/django_leeway
+ExecStart=/opt/leeway/.venv/bin/celery -A leeway worker -l INFO
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
