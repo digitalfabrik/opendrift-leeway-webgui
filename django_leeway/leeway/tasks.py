@@ -12,7 +12,6 @@ from leeway.models import LeewaySimulation
 def run_leeway_simulation(request_id):
     simulation = LeewaySimulation.objects.get(uuid=request_id)
     simulation.simulation_started = datetime.now()
-    print("starting")
     simulation.save()
     params = ["docker", "run", "-it", "--volume",
               "{}:/code/leeway".format(settings.SIMULATION_PATH),
@@ -23,6 +22,7 @@ def run_leeway_simulation(request_id):
               "--start-time", str(simulation.start_time.strftime("%Y-%m-%d %H:%M")),
               "--duration", str(simulation.duration),
               "--id", str(simulation.uuid)]
-    subprocess.Popen(params)
+    sim_proc = subprocess.Popen(params)
+    sim_proc.communicate()
     simulation.simulation_finished = datetime.now()
     simulation.save()
