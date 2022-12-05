@@ -135,3 +135,5 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 SIMULATION_PATH=os.path.join(BASE_DIR.parent, "simulation")
+
+MAIL_FROM="noreply@example.com"

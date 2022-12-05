@@ -82,3 +82,32 @@ LEEWAY_OBJECT_TYPES = (
     (76, 'Immigration vessel, Cuban refugee-raft, no sail (*7)'),
     (77, 'Immigration vessel, Cuban refugee-raft, with sail (*7)')
 )
+
+
+def send_mail(mail_to, uuid):
+    """
+    Send result e-mail with simulation image attached.
+    """
+    import os
+    import smtplib
+    from django.conf import settings
+    from email.mime.text import MIMEText
+    from email.mime.image import MIMEImage
+    from email.mime.multipart import MIMEMultipart
+    image_path = "{}/{}.png".format(settings.SIMULATION_PATH, uuid)
+    with open(image_path, 'rb') as image_f:
+        img_data = image_f.read()
+
+    msg = MIMEMultipart()
+    msg['Subject'] = 'Leeway Drift Simulation Result'
+    msg['From'] = 'e@mail.cc'
+    msg['To'] = mail_to
+
+    text = MIMEText("Your request with ID {} has been processed. Find the image attached.".format(uuid))
+    msg.attach(text)
+    image = MIMEImage(img_data, name=os.path.basename(image_path))
+    msg.attach(image)
+
+    smtp = smtplib.SMTP("localhost")
+    smtp.sendmail("keineantwort@integrat-app.de", mail_to, msg.as_string())
+    smtp.close()
