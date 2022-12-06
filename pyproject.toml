@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opendrift-leeway"
+description = "Web GUI for Leeway simulations with OpenDrift"
+version = "2022.12.0"
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["OpenDrift", "Leeway", "SAR", "Search", "Rescue", "Simulation", "Drift"]
+license = {text = "Apache2 2.0 License"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Django",
+    "Framework :: Django :: 4",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "celery",
+    "django>=4.1",
+    "dms2dec",
+    "redis",
+]
+
+[tool.setuptools.packages.find]
+include = ["opendrift_leeway*"]
