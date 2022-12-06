@@ -3,6 +3,10 @@ This is a little Django web application that does an OpenDrift Leeway simulation
 
 This is an experimental tool to help Search and Rescue operations.
 
+Sample output from the leeway tool (100 points, 1km radius, near Lampedusa):
+
+![Example leeway output](./leeway-example-output.png)
+
 # Install
 1. Clone this repository and `cd` into the new directory
 1. Create an virtual environment and activate it:
