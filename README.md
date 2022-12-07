@@ -5,7 +5,7 @@ This is an experimental tool to help Search and Rescue operations.
 
 ample output from the leeway tool (100 points, 1km radius, near Lampedusa):
 
-![Example leeway output](./leeway-example-output.png)
+![Example leeway output](./.github/leeway-simulation-output.png)
 
 
 # Install
