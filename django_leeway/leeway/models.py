@@ -24,6 +24,7 @@ class LeewaySimulation(models.Model):
     object_type = models.IntegerField(choices=LEEWAY_OBJECT_TYPES, default=27)
     simulation_started = models.DateTimeField(null=True)
     simulation_finished = models.DateTimeField(null=True)
+    radius = models.IntegerField(default=1000)
 
     def __str__(self):
         return "{} {}".format(self.uuid, self.user.email)
