@@ -90,13 +90,21 @@ def send_result_mail(simulation):
     """
     import os
     import smtplib
+    from pathlib import Path
     from django.conf import settings
     from email.mime.text import MIMEText
     from email.mime.image import MIMEImage
     from email.mime.multipart import MIMEMultipart
+
     image_path = "{}/{}.png".format(settings.SIMULATION_PATH, simulation.uuid)
-    with open(image_path, 'rb') as image_f:
-        img_data = image_f.read()
+    if Path(image_path).is_file():
+        with open(image_path, 'rb') as image_f:
+            img_data = image_f.read()
+        success = True
+        text = "Find the image attached."
+    else:
+        success = False
+        text = "The simulation failed."
 
     msg = MIMEMultipart()
     msg['Subject'] = 'Leeway Drift Simulation Result'
@@ -105,7 +113,7 @@ def send_result_mail(simulation):
 
     text = MIMEText(
         (
-            "Your request with ID {uuid} has been processed. Find the image attached.\n\n"
+            "Your request with ID {uuid} has been processed. {text}\n\n"
             "Simulation parameters:\n"
             "- Longitude: {longitude}\n"
             "- Latitude: {latitude}\n"
@@ -114,6 +122,7 @@ def send_result_mail(simulation):
             "- Duration: {duration}\n"
             "- Object type: {object_type}\n"
         ).format(
+            text=text,
             uuid=simulation.uuid,
             longitude=simulation.longitude,
             latitude=simulation.latitude,
@@ -124,8 +133,9 @@ def send_result_mail(simulation):
         )
     )
     msg.attach(text)
-    image = MIMEImage(img_data, name=os.path.basename(image_path))
-    msg.attach(image)
+    if success:
+        image = MIMEImage(img_data, name=os.path.basename(image_path))
+        msg.attach(image)
 
     smtp = smtplib.SMTP("localhost")
     smtp.sendmail(settings.MAIL_FROM, simulation.user.email, msg.as_string())
