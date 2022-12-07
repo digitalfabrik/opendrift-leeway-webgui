@@ -1,7 +1,7 @@
 # About
-This is a little Django web application that does an OpenDrift Leeway simulation with a set of provided parameters via a web formular. The result is sent to a user via e-mail.
+This is a little Django web application that does an [OpenDrift](https://github.com/OpenDrift/opendrift) [Leeway](https://opendrift.github.io/choosing_a_model.html) simulation with a set of provided parameters via a web formular. The result is sent to a user via e-mail.
 
-This is an experimental tool to help Search and Rescue operations.
+This is an experimental tool to help Search and Rescue operations. An experimental service is available at [leeway.tuerantuer.org](https://leeway.tuerantuer.org).
 
 Sample output from the leeway tool (100 points, 1km radius, Denmark):
 
