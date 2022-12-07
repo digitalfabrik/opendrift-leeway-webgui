@@ -21,10 +21,12 @@ class LeewaySimulationForm(ModelForm):
         Configure form fields and help text.
         """
         model = LeewaySimulation
-        fields = ['longitude', 'latitude', 'object_type', 'start_time', 'duration']
+        fields = ['longitude', 'latitude', 'object_type', 'start_time', 'duration', 'radius']
 
         help_texts = {
-            'duration': 'Length of simulation in hours.'
+            'duration': 'Length of simulation in hours.',
+            'radius': ('Radius for distributing drifting particles around '
+                       'the start coordinates in meters.')
         }
 
     def clean_longitude(self):
