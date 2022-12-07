@@ -3,7 +3,7 @@ This is a little Django web application that does an [OpenDrift](https://github.
 
 This is an experimental tool to help Search and Rescue operations. An experimental service is available at [leeway.tuerantuer.org](https://leeway.tuerantuer.org).
 
-Sample output from the leeway tool (100 points, 1km radius, Denmark):
+Sample output from the leeway tool (100 points, 1km radius, south of Lampedusa):
 
 ![Example leeway output](./.github/leeway-simulation-output.png)
 
