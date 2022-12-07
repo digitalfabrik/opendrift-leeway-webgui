@@ -84,7 +84,7 @@ LEEWAY_OBJECT_TYPES = (
 )
 
 
-def send_mail(mail_to, uuid):
+def send_result_mail(simulation):
     """
     Send result e-mail with simulation image attached.
     """
@@ -94,20 +94,39 @@ def send_mail(mail_to, uuid):
     from email.mime.text import MIMEText
     from email.mime.image import MIMEImage
     from email.mime.multipart import MIMEMultipart
-    image_path = "{}/{}.png".format(settings.SIMULATION_PATH, uuid)
+    image_path = "{}/{}.png".format(settings.SIMULATION_PATH, simulation.uuid)
     with open(image_path, 'rb') as image_f:
         img_data = image_f.read()
 
     msg = MIMEMultipart()
     msg['Subject'] = 'Leeway Drift Simulation Result'
-    msg['From'] = 'e@mail.cc'
-    msg['To'] = mail_to
+    msg['From'] = settings.MAIL_FROM
+    msg['To'] = simulation.user.email
 
-    text = MIMEText("Your request with ID {} has been processed. Find the image attached.".format(uuid))
+    text = MIMEText(
+        (
+            "Your request with ID {uuid} has been processed. Find the image attached.\n\n"
+            "Simulation parameters:\n"
+            "- Longitude: {longitude}\n"
+            "- Latitude: {latitude}\n"
+            "- Radius: {radius}\n"
+            "- Start time: {start_time}\n"
+            "- Duration: {duration}\n"
+            "- Object type: {object_type}\n"
+        ).format(
+            uuid=simulation.uuid,
+            longitude=simulation.longitude,
+            latitude=simulation.latitude,
+            radius=simulation.radius,
+            start_time=simulation.start_time,
+            duration=simulation.duration,
+            object_type=simulation.object_type
+        )
+    )
     msg.attach(text)
     image = MIMEImage(img_data, name=os.path.basename(image_path))
     msg.attach(image)
 
     smtp = smtplib.SMTP("localhost")
-    smtp.sendmail("keineantwort@integrat-app.de", mail_to, msg.as_string())
+    smtp.sendmail(settings.MAIL_FROM, simulation.user.email, msg.as_string())
     smtp.close()

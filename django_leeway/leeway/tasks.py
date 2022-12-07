@@ -5,7 +5,7 @@ from datetime import datetime
 from django.conf import settings
 
 from .celery import app
-from .utils import send_mail
+from .utils import send_result_mail
 from celery import shared_task
 from leeway.models import LeewaySimulation
 
@@ -27,5 +27,5 @@ def run_leeway_simulation(request_id):
     sim_proc = subprocess.Popen(params)
     sim_proc.communicate()
     simulation.simulation_finished = datetime.now()
-    send_mail(simulation.user.email, request_id)
+    send_result_mail(simulation)
     simulation.save()
