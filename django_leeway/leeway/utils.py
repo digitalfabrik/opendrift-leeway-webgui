@@ -1,6 +1,7 @@
 """
 Utilities
 """
+from django.conf import settings
 
 # https://github.com/OpenDrift/opendrift/blob/master/opendrift/models/OBJECTPROP.DAT
 LEEWAY_OBJECT_TYPES = (
@@ -83,60 +84,122 @@ LEEWAY_OBJECT_TYPES = (
     (77, 'Immigration vessel, Cuban refugee-raft, with sail (*7)')
 )
 
+SIMULATION_ARGUMENTS = ["latitude", "longitude", "duration", "radius", "object_type", "start_time"]
 
-def send_result_mail(simulation):
+def send_result_mail(simulation, message_content_func='result_mail'):
     """
     Send result e-mail with simulation image attached.
     """
-    import os
+    import sys
     import smtplib
-    from pathlib import Path
-    from django.conf import settings
-    from email.mime.text import MIMEText
-    from email.mime.image import MIMEImage
     from email.mime.multipart import MIMEMultipart
 
+    msg = MIMEMultipart()
+    msg['From'] = settings.MAIL_USER
+    msg['To'] = simulation.user.email
+    content_func = getattr(sys.modules[__name__], message_content_func)
+    msg = content_func(simulation, msg)
+    smtp = smtplib.SMTP(settings.MAIL_SMTP, 587)
+    smtp.starttls()
+    smtp.login(settings.MAIL_USER, settings.MAIL_PASS)
+    smtp.sendmail(settings.MAIL_USER, simulation.user.email, msg.as_string())
+    smtp.close()
+
+def confirmation_mail(simulation, msg):
+    """
+    Create confirmation mail
+    """
+    from email.mime.text import MIMEText
+    msg['Subject'] = 'Leeway Drift Simulation Order received'
+    text = MIMEText(('Request saved. You will receive an e-mail to {} when the simulation '
+                     'is finished. Your request ID is {}.').format(
+                         simulation.user.email, simulation.uuid
+                     ))
+    msg.attach(text)
+    return msg
+
+def result_mail(simulation, msg):
+    """
+    Create mail parts for result mail
+    """
+    import os
+    from pathlib import Path
+    from email.mime.text import MIMEText
+    from email.mime.image import MIMEImage
     image_path = "{}/{}.png".format(settings.SIMULATION_PATH, simulation.uuid)
+    success = False
     if Path(image_path).is_file():
         with open(image_path, 'rb') as image_f:
             img_data = image_f.read()
         success = True
-        text = "Find the image attached."
-    else:
-        success = False
-        text = "The simulation failed."
-
-    msg = MIMEMultipart()
     msg['Subject'] = 'Leeway Drift Simulation Result'
-    msg['From'] = settings.MAIL_FROM
-    msg['To'] = simulation.user.email
-
-    text = MIMEText(
-        (
-            "Your request with ID {uuid} has been processed. {text}\n\n"
-            "Simulation parameters:\n"
-            "- Longitude: {longitude}\n"
-            "- Latitude: {latitude}\n"
-            "- Radius: {radius}\n"
-            "- Start time: {start_time}\n"
-            "- Duration: {duration}\n"
-            "- Object type: {object_type}\n"
-        ).format(
-            text=text,
-            uuid=simulation.uuid,
-            longitude=simulation.longitude,
-            latitude=simulation.latitude,
-            radius=simulation.radius,
-            start_time=simulation.start_time,
-            duration=simulation.duration,
-            object_type=simulation.object_type
-        )
-    )
+    text = MIMEText(mail_result_text(simulation, success))
     msg.attach(text)
     if success:
         image = MIMEImage(img_data, name=os.path.basename(image_path))
         msg.attach(image)
+    return msg
 
-    smtp = smtplib.SMTP("localhost")
-    smtp.sendmail(settings.MAIL_FROM, simulation.user.email, msg.as_string())
-    smtp.close()
+def mail_result_text(simulation, success):
+    """
+    Create a result mail text
+    """
+    if success:
+        text = "Find the image attached."
+    else:
+        text = "The simulation failed."
+    return (
+        "Your request with ID {uuid} has been processed. {text}\n\n"
+        "Simulation parameters:\n"
+        "- Longitude: {longitude}\n"
+        "- Latitude: {latitude}\n"
+        "- Radius: {radius}\n"
+        "- Start time: {start_time}\n"
+        "- Duration: {duration}\n"
+        "- Object type: {object_type}\n"
+    ).format(
+        text=text,
+        uuid=simulation.uuid,
+        longitude=simulation.longitude,
+        latitude=simulation.latitude,
+        radius=simulation.radius,
+        start_time=simulation.start_time,
+        duration=simulation.duration,
+        object_type=simulation.object_type
+    )
+
+def mail_to_simulation(message):
+    """
+    Parse content of incoming mail and create a simulation and a response
+    """
+    from django.contrib.auth.models import User
+    from .models import LeewaySimulation
+    from .tasks import run_leeway_simulation
+
+    from_addr = message.get('From')
+    if "<" in from_addr and ">" in from_addr:
+        from_addr = from_addr.split("<")[1].rstrip(">")
+    try:
+        user = User.objects.get(email=from_addr)
+    except User.DoesNotExist:
+        return
+    arguments_subject = parse_mail_arguments(message.get('Subject'))
+    arguments_body = parse_mail_arguments(message.get_payload(), delimiter='\n')
+    arguments = {**arguments_subject, **arguments_body, "user":user}
+    simulation = LeewaySimulation(**arguments)
+    simulation.save()
+    run_leeway_simulation.apply_async([simulation.uuid])
+    send_result_mail(simulation, 'confirmation_mail')
+
+def parse_mail_arguments(text, delimiter=";"):
+    """
+    Parse simulation arguments from string
+    """
+    arguments = {}
+    parts = text.split(delimiter)
+    for part in [part.strip() for part in parts]:
+        if "=" in part:
+            key, value = part.split("=")
+            if key in SIMULATION_ARGUMENTS:
+                arguments[key.strip()] = value.strip()
+    return arguments

@@ -1,16 +1,21 @@
-import subprocess, sys
-
+import subprocess
+import sys
 from datetime import datetime
+from imaplib import IMAP4_SSL
 
 from django.conf import settings
-
-from .celery import app
-from .utils import send_result_mail
 from celery import shared_task
 from leeway.models import LeewaySimulation
 
+from .celery import app
+from .utils import send_result_mail
+
 @app.task
 def run_leeway_simulation(request_id):
+    """
+    Get parameters for simulation from database and kick off the simulation
+    process in a docker container. The result is then mailed to the user.
+    """
     simulation = LeewaySimulation.objects.get(uuid=request_id)
     simulation.simulation_started = datetime.now()
     simulation.save()
