@@ -201,5 +201,17 @@ def parse_mail_arguments(text, delimiter=";"):
         if "=" in part:
             key, value = part.split("=")
             if key in SIMULATION_ARGUMENTS:
-                arguments[key.strip()] = value.strip()
+                if key in ["longitude", "latitude"]:
+                    arguments[key.strip()] = normalize_dms2dec(value.strip())
+                else:
+                    arguments[key.strip()] = value.strip()
     return arguments
+
+def normalize_dms2dec(data):
+    """
+    If the string contains a DMS coordinate then convert to decimal.
+    Decimal values are returned as is.
+    """
+    if "°" in data:
+        return dms2dec(data)
+    return data
