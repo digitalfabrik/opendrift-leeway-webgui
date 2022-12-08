@@ -1,4 +1,4 @@
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm, CharField, TextInput
 from dms2dec.dms_convert import dms2dec
 
 from .models import LeewaySimulation
@@ -14,16 +14,18 @@ class LeewaySimulationForm(ModelForm):
         """
         super().__init__(*args, **kwargs)
         self.fields['longitude'] = CharField(
-            help_text='Input in decimal and degrees minutes seconds supported.')
+            help_text='(E/W) Input in decimal and degrees minutes seconds supported.',
+            widget=TextInput(attrs={'placeholder':'12° 26\' 42.684"'}))
         self.fields['latitude'] = CharField(
-            help_text='Input in decimal and degrees minutes seconds supported.')
+            help_text='(N/S) Input in decimal and degrees minutes seconds supported.',
+            widget=TextInput(attrs={'placeholder':'34° 47\' 49.1166"'}))
 
     class Meta:  # pylint: disable=too-few-public-methods
         """
         Configure form fields and help text.
         """
         model = LeewaySimulation
-        fields = ['longitude', 'latitude', 'object_type', 'start_time', 'duration', 'radius']
+        fields = ['latitude', 'longitude', 'object_type', 'start_time', 'duration', 'radius']
 
         help_texts = {
             'duration': 'Length of simulation in hours.',
