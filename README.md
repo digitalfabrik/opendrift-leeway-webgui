@@ -8,6 +8,11 @@ Sample output from the leeway tool (100 points, 1km radius, south of Lampedusa):
 
 ![Example leeway output](./.github/leeway-simulation-output.png)
 
+# Usage
+
+Django users have to be created in the CRUD backend, available at https://leeway.example.com/admin. E-mail addresses should be added for users as they receive the result via e-mail.
+
+The program regularly fetches incoming mails via IMAP and starts simulations from key-value-pairs in the mail subject or text body. The sender of the mail needs to have an associated account. Allowed keys via e-mail are: `longitude`, `latitude`, `object_type`, `radius`, `duration`, `start_time`. The separator between key and value is `=`. Key-value-pairs are separated by `;` in the subject and by new lines in the text body. The date format for start date is `YYYY-MM-DD HH:MM:SS`.
 
 # Installation
 

@@ -1,8 +1,10 @@
+"""
+Forms for the web GUI
+"""
 from django.forms import ModelForm, CharField, TextInput
-from dms2dec.dms_convert import dms2dec
 
 from .models import LeewaySimulation
-
+from .utils import normalize_dms2dec
 
 class LeewaySimulationForm(ModelForm):
     """
@@ -37,16 +39,10 @@ class LeewaySimulationForm(ModelForm):
         """
         Convert longitude DMS to decimal
         """
-        data = self.cleaned_data.get('longitude', '')
-        if "°" in data:
-            return dms2dec(data)
-        return data
+        return normalize_dms2dec(self.cleaned_data.get('longitude', ''))
 
     def clean_latitude(self):
         """
         Convert latitude DMS to decimal
         """
-        data = self.cleaned_data.get('latitude', '')
-        if "°" in data:
-            return dms2dec(data)
-        return data
+        return normalize_dms2dec(self.cleaned_data.get('latitude', ''))
