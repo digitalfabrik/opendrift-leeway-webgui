@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "opendrift-leeway"
 description = "Web GUI for Leeway simulations with OpenDrift"
-version = "2022.12.0"
+version = "2022.12.1"
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = ["OpenDrift", "Leeway", "SAR", "Search", "Rescue", "Simulation", "Drift"]
