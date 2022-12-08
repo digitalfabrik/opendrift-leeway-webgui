@@ -48,11 +48,11 @@ Sample output from the leeway tool (100 points, 1km radius, south of Lampedusa):
       ```
 
 
-# Packaging
+# Releasing
 
-1. Install build dependencies: `python3 -m pip install --upgrade build twine`
-2. Build python package: `python3 -m build`
-3. Upload target distribution to PyPI: `twine upload ./dist/opendrift-leeway-*.tar.gz`
+1. Bump the version in `pyproject.toml`
+2. Commit and push your changes: `git commit -m "Bump version to <version>" && git push`
+3. Tag your commit and push: `git tag <version> && git push origin <version>`
 
 
 # Production Server
