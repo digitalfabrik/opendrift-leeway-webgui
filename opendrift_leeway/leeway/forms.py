@@ -1,6 +1,8 @@
 from django.forms import ModelForm, CharField
-from leeway.models import LeewaySimulation
 from dms2dec.dms_convert import dms2dec
+
+from .models import LeewaySimulation
+
 
 class LeewaySimulationForm(ModelForm):
     """

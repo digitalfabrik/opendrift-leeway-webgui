@@ -5,9 +5,9 @@ from imaplib import IMAP4_SSL
 
 from django.conf import settings
 from celery import shared_task
-from leeway.models import LeewaySimulation
 
 from .celery import app
+from .models import LeewaySimulation
 from .utils import send_result_mail
 
 @app.task
