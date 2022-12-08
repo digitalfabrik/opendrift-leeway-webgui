@@ -134,6 +134,9 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-SIMULATION_PATH=os.path.join(BASE_DIR.parent, "simulation")
+SIMULATION_PATH = os.path.join(BASE_DIR.parent, "simulation")
 
-MAIL_FROM="noreply@example.com"
+MAIL_USER = "user@example.com"
+MAIL_PASS = "MYSECERET"
+MAIL_SMTP = "smtp.example.com" # uses StartTLS on port 587
+MAIL_IMAP = "imap.example.com" # uses SSL on Port 993
