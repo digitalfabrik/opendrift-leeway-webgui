@@ -2,6 +2,7 @@
 Utilities
 """
 from django.conf import settings
+from dms2dec.dms_convert import dms2dec
 
 # https://github.com/OpenDrift/opendrift/blob/master/opendrift/models/OBJECTPROP.DAT
 LEEWAY_OBJECT_TYPES = (
