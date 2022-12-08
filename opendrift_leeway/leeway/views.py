@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from leeway.forms import LeewaySimulationForm
+from .forms import LeewaySimulationForm
 from .tasks import run_leeway_simulation
 
 @login_required

@@ -1,4 +1,6 @@
 from django.contrib import admin
-from leeway.models import LeewaySimulation
+
+from .models import LeewaySimulation
+
 
 admin.site.register(LeewaySimulation)
