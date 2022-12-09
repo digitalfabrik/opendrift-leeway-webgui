@@ -1,6 +1,15 @@
 """
 Utilities
 """
+import os
+import sys
+import smtplib
+from pathlib import Path
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+
+from django.apps import apps
 from django.conf import settings
 from dms2dec.dms_convert import dms2dec
 
@@ -91,9 +100,6 @@ def send_result_mail(simulation, message_content_func='result_mail'):
     """
     Send result e-mail with simulation image attached.
     """
-    import sys
-    import smtplib
-    from email.mime.multipart import MIMEMultipart
 
     msg = MIMEMultipart()
     msg['From'] = settings.MAIL_USER
@@ -110,7 +116,6 @@ def confirmation_mail(simulation, msg):
     """
     Create confirmation mail
     """
-    from email.mime.text import MIMEText
     msg['Subject'] = 'Leeway Drift Simulation Order received'
     text = MIMEText(('Request saved. You will receive an e-mail to {} when the simulation '
                      'is finished. Your request ID is {}.').format(
@@ -123,10 +128,7 @@ def result_mail(simulation, msg):
     """
     Create mail parts for result mail
     """
-    import os
-    from pathlib import Path
-    from email.mime.text import MIMEText
-    from email.mime.image import MIMEImage
+
     image_path = "{}/{}.png".format(settings.SIMULATION_PATH, simulation.uuid)
     success = False
     if Path(image_path).is_file():
@@ -174,23 +176,22 @@ def mail_to_simulation(message):
     Parse content of incoming mail and create a simulation and a response
     """
     from django.contrib.auth.models import User
-    from .models import LeewaySimulation
     from .tasks import run_leeway_simulation
-
+    LeewaySimulation = apps.get_model(app_label='leeway', model_name='LeewaySimulation')
     from_addr = message.get('From')
     if "<" in from_addr and ">" in from_addr:
         from_addr = from_addr.split("<")[1].rstrip(">")
     try:
         user = User.objects.get(email=from_addr)
-    except User.DoesNotExist:
+    except user.DoesNotExist:
         return
     arguments_subject = parse_mail_arguments(message.get('Subject'))
     arguments_body = parse_mail_arguments(message.get_payload(), delimiter='\n')
     arguments = {**arguments_subject, **arguments_body, "user":user}
     simulation = LeewaySimulation(**arguments)
     simulation.save()
-    run_leeway_simulation.apply_async([simulation.uuid])
     send_result_mail(simulation, 'confirmation_mail')
+    run_leeway_simulation(str(simulation.uuid))
 
 def parse_mail_arguments(text, delimiter=";"):
     """

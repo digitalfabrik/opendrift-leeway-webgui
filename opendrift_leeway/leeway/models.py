@@ -28,3 +28,6 @@ class LeewaySimulation(models.Model):
 
     def __str__(self):
         return "{} {}".format(self.uuid, self.user.email)
+
+    class Meta:
+        app_label="leeway"

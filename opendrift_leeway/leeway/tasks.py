@@ -3,11 +3,12 @@ import sys
 from datetime import datetime
 from imaplib import IMAP4_SSL
 
+from django.apps import apps
 from django.conf import settings
 from celery import shared_task
 
 from .celery import app
-from .models import LeewaySimulation
+
 from .utils import send_result_mail
 
 @app.task
@@ -16,6 +17,7 @@ def run_leeway_simulation(request_id):
     Get parameters for simulation from database and kick off the simulation
     process in a docker container. The result is then mailed to the user.
     """
+    LeewaySimulation = apps.get_model(app_label='leeway', model_name='LeewaySimulation')
     simulation = LeewaySimulation.objects.get(uuid=request_id)
     simulation.simulation_started = datetime.now()
     simulation.save()
