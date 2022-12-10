@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+from distutils.util import strtobool
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -137,9 +138,49 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 SIMULATION_PATH = os.path.join(BASE_DIR.parent, "simulation")
 
-MAIL_USER = "user@example.com"
-MAIL_PASS = "MYSECERET"
-MAIL_SMTP = "smtp.example.com" # uses StartTLS on port 587
-MAIL_IMAP = "imap.example.com" # uses SSL on Port 993
-
 OPENDRIFT_NUMBER_DRIFTERS = 100
+
+
+##########
+# EMAILS #
+##########
+
+if DEBUG:
+    #: The backend to use for sending emails (see :setting:`django:EMAIL_BACKEND` and :doc:`django:topics/email`)
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+#: The email address that error messages come from (see :setting:`django:SERVER_EMAIL`)
+SERVER_EMAIL = os.environ.get(
+    "LEEWAY_SERVER_EMAIL"
+)
+
+#: Default email address to use for various automated correspondence from the site manager(s)
+#: (see :setting:`django:DEFAULT_FROM_EMAIL`)
+DEFAULT_FROM_EMAIL = SERVER_EMAIL
+
+#: The host to use for sending email (see :setting:`django:EMAIL_HOST`)
+EMAIL_HOST = os.environ.get("LEEWAY_EMAIL_HOST", "localhost")
+
+#: Password to use for the SMTP server defined in :attr:`~LEEWAY.core.settings.EMAIL_HOST`
+#: (see :setting:`django:EMAIL_HOST_PASSWORD`). If empty, Django won’t attempt authentication.
+EMAIL_HOST_PASSWORD = os.environ.get("LEEWAY_EMAIL_HOST_PASSWORD")
+
+#: Username to use for the SMTP server defined in :attr:`~LEEWAY.core.settings.EMAIL_HOST`
+#: (see :setting:`django:EMAIL_HOST_USER`). If empty, Django won’t attempt authentication.
+EMAIL_HOST_USER = os.environ.get("LEEWAY_EMAIL_HOST_USER", SERVER_EMAIL)
+
+#: Port to use for the SMTP server defined in :attr:`~LEEWAY.core.settings.EMAIL_HOST`
+#: (see :setting:`django:EMAIL_PORT`)
+EMAIL_PORT = int(os.environ.get("LEEWAY_EMAIL_PORT", 587))
+
+#: Whether to use a TLS (secure) connection when talking to the SMTP server.
+#: This is used for explicit TLS connections, generally on port 587.
+#: (see :setting:`django:EMAIL_USE_TLS`)
+EMAIL_USE_TLS = bool(strtobool(os.environ.get("LEEWAY_EMAIL_USE_TLS", "True")))
+
+#: Whether to use an implicit TLS (secure) connection when talking to the SMTP server.
+#: In most email documentation this type of TLS connection is referred to as SSL. It is generally used on port 465.
+#: (see :setting:`django:EMAIL_USE_SSL`)
+EMAIL_USE_SSL = bool(strtobool(os.environ.get("LEEWAY_EMAIL_USE_SSL", "False")))

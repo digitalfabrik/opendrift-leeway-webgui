@@ -1,7 +1,6 @@
 import subprocess
 import sys
 from datetime import datetime
-from imaplib import IMAP4_SSL
 
 from django.apps import apps
 from django.conf import settings
