@@ -1,4 +1,6 @@
-simulation/*.png
+simulation/output/*.png
+simulation/input/*.nc
+.netrc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
