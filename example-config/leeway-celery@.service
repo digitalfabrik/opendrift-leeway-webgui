@@ -1,4 +1,4 @@
-# /etc/systemd/system/leeway-celery.service
+# /etc/systemd/system/leeway-celery@.service
 [Unit]
 Description=Celery worker for Leeway simulations
 After=syslog.target network.target
@@ -6,8 +6,8 @@ After=syslog.target network.target
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/opt/leeway/django_leeway
-ExecStart=/opt/leeway/.venv/bin/celery -A leeway worker -l INFO -B --concurrency=%I
+WorkingDirectory=/opt/opendrift-leeway-webgui
+ExecStart=/opt/opendrift-leeway-webgui/.venv/bin/celery -A leeway worker -l INFO -B --concurrency=%I
 Restart=on-abort
 
 [Install]

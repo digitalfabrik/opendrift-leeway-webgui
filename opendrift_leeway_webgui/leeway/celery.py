@@ -9,7 +9,7 @@ from django.conf import settings
 
 from .utils import mail_to_simulation
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendrift_leeway_webgui.core.settings')
 app = Celery('leeway')  # pylint: disable=invalid-name
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
