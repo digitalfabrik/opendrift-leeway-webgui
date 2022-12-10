@@ -141,3 +141,5 @@ MAIL_USER = "user@example.com"
 MAIL_PASS = "MYSECERET"
 MAIL_SMTP = "smtp.example.com" # uses StartTLS on port 587
 MAIL_IMAP = "imap.example.com" # uses SSL on Port 993
+
+OPENDRIFT_NUMBER_DRIFTERS = 100

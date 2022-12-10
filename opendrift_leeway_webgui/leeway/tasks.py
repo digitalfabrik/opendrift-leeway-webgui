@@ -28,6 +28,7 @@ def run_leeway_simulation(request_id):
               "--longitude", str(simulation.longitude),
               "--latitude", str(simulation.latitude),
               "--radius", str(simulation.radius),
+              "--number", str(settings.OPENDRIFT_NUMBER_DRIFTERS),
               "--start-time", str(simulation.start_time.strftime("%Y-%m-%d %H:%M")),
               "--duration", str(simulation.duration),
               "--id", str(simulation.uuid)]

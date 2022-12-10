@@ -35,6 +35,10 @@ PARSER.add_argument('--object-type',
                           'opendrift/blob/master/opendrift/models/OBJECTPROP.DAT'),
                     type=int,
                     default=27)
+PARSER.add_argument('--number',
+                    help='Number of drifters simulated.',
+                    type=int,
+                    default=100)
 PARSER.add_argument('--radius',
                     help=('Radius for distributing drifting particles around the start coordinates '
                           'in meters.'),
@@ -57,7 +61,7 @@ SIMULATION.add_reader([READER_LANDMASK])
 SIMULATION.seed_elements(lon=ARGS.longitude,
                          lat=ARGS.latitude,
                          time=datetime.strptime(ARGS.start_time, '%Y-%m-%d %H:%M'),
-                         number=100, radius=ARGS.radius,
+                         number=ARGS.number, radius=ARGS.radius,
                          object_type=ARGS.object_type)
 
 SIMULATION.run(duration=timedelta(hours=ARGS.duration), time_step=600)
