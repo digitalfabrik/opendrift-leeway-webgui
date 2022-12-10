@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "opendrift-leeway-webgui"
 description = "Web GUI for Leeway simulations with OpenDrift"
-version = "2022.12.1"
+version = "2022.12.0"
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = ["OpenDrift", "Leeway", "SAR", "Search", "Rescue", "Simulation", "Drift"]
@@ -24,5 +24,22 @@ dependencies = [
     "redis",
 ]
 
+[project.optional-dependencies]
+dev = ["bumpver"]
+
 [tool.setuptools.packages.find]
 include = ["opendrift_leeway_webgui*"]
+
+[tool.bumpver]
+current_version = "2022.12.0"
+version_pattern = "YYYY.MM.INC0[-TAG]"
+commit_message = "Bump version to {new_version}"
+commit = true
+tag = true
+push = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'current_version = "{version}"',
+    'version = "{version}"',
+]
