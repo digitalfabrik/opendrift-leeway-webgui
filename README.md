@@ -32,14 +32,14 @@ The program regularly fetches incoming mails via IMAP and starts simulations fro
    ```
 4. Initialize the database:
    ```bash
-   cd opendrift_leeway
+   cd opendrift_leeway_webgui
    python3 manage.py migrate
    python3 manage.py createsuperuser
    ```
 
 # Development Server
 
-1. Switch into the cloned project and then into the `opendrift_leeway` subdirectory.
+1. Switch into the cloned project and then into the `opendrift_leeway_webgui` subdirectory.
 2. Open two terminals:
    1. In the first terminal run:
       ```bash
@@ -66,8 +66,8 @@ This details the installation on Debian with Apache2 and mod_wsgi.
 
 1. Create target directory on the production system:
    ```bash
-   sudo mkdir /opt/iopendrift-leeway
-   sudo chown www-data:www-data /opt/opendrift-leeway
+   sudo mkdir /opt/iopendrift-leeway-webgui
+   sudo chown www-data:www-data /opt/opendrift-leeway-webgui
    ```
 2. Create the virtual environment:
    ```bash
@@ -77,12 +77,12 @@ This details the installation on Debian with Apache2 and mod_wsgi.
    ```
 3. Install the application into the virtual environment:
    ```bash
-   pip install opendrift-leeway
+   pip install opendrift-leeway-webgui
    ```
 4. Install Docker and add the `docker` group to the `www-data` user.
 5. Create symlink to facilitate the Apache configuration:
    ```bash
-   ln -s $(python -c "from opendrift_leeway.core import wsgi; print(wsgi.__file__)") .
+   ln -s $(python -c "from opendrift_leeway_webgui.core import wsgi; print(wsgi.__file__)") .
    ```
 6. Configure Apache2 according to example.
 7. Set up Celery worker with `leeway-celery.service` and start the service.

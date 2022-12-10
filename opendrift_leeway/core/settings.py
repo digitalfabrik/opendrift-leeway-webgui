@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'opendrift_leeway.leeway'
+    'opendrift_leeway_webgui.leeway'
 ]
 
 MIDDLEWARE = [
@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'opendrift_leeway.core.urls'
+ROOT_URLCONF = 'opendrift_leeway_webgui.core.urls'
 
 TEMPLATES = [
     {

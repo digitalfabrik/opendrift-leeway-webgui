@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "opendrift-leeway"
+name = "opendrift-leeway-webgui"
 description = "Web GUI for Leeway simulations with OpenDrift"
 version = "2022.12.1"
 readme = "README.md"
@@ -25,4 +25,4 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["opendrift_leeway*"]
+include = ["opendrift_leeway_webgui*"]
