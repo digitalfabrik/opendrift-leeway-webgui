@@ -25,8 +25,8 @@ def check_mailbox():
     """
     Fetch mails from mailbox via IMAP and create new jobs
     """
-    mailbox = IMAP4_SSL(host=settings.MAIL_IMAP)
-    mailbox.login(settings.MAIL_USER, settings.MAIL_PASS)
+    mailbox = IMAP4_SSL(host=settings.EMAIL_HOST)
+    mailbox.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
     mailbox.select('Inbox')
     typ, data = mailbox.search(None, 'UNSEEN')  # pylint: disable=unused-variable
     for num in data[0].split():

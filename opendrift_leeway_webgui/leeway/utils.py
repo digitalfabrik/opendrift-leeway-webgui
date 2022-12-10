@@ -3,14 +3,11 @@ Utilities
 """
 import os
 import sys
-import smtplib
 from pathlib import Path
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
 
 from django.apps import apps
 from django.conf import settings
+from django.core.mail import EmailMessage, send_mail
 from dms2dec.dms_convert import dms2dec
 
 # https://github.com/OpenDrift/opendrift/blob/master/opendrift/models/OBJECTPROP.DAT
@@ -96,52 +93,41 @@ LEEWAY_OBJECT_TYPES = (
 
 SIMULATION_ARGUMENTS = ["latitude", "longitude", "duration", "radius", "object_type", "start_time"]
 
-def send_result_mail(simulation, message_content_func='result_mail'):
-    """
-    Send result e-mail with simulation image attached.
-    """
 
-    msg = MIMEMultipart()
-    msg['From'] = settings.MAIL_USER
-    msg['To'] = simulation.user.email
-    content_func = getattr(sys.modules[__name__], message_content_func)
-    msg = content_func(simulation, msg)
-    smtp = smtplib.SMTP(settings.MAIL_SMTP, 587)
-    smtp.starttls()
-    smtp.login(settings.MAIL_USER, settings.MAIL_PASS)
-    smtp.sendmail(settings.MAIL_USER, simulation.user.email, msg.as_string())
-    smtp.close()
-
-def confirmation_mail(simulation, msg):
+def send_confirmation_mail(simulation):
     """
     Create confirmation mail
     """
-    msg['Subject'] = 'Leeway Drift Simulation Order received'
-    text = MIMEText(('Request saved. You will receive an e-mail to {} when the simulation '
-                     'is finished. Your request ID is {}.').format(
-                         simulation.user.email, simulation.uuid
-                     ))
-    msg.attach(text)
-    return msg
+    return send_mail(
+        'Leeway Drift Simulation Order received',
+        f'Request saved. You will receive an e-mail to {simulation.user.email} '
+        f'when the simulation is finished. Your request ID is {simulation.uuid}.',
+        None,
+        [simulation.user.email],
+    )
 
-def result_mail(simulation, msg):
+def send_result_mail(simulation):
     """
     Create mail parts for result mail
     """
-
-    image_path = "{}/{}.png".format(settings.SIMULATION_PATH, simulation.uuid)
+    # Try to open simulation result image
+    image_path = f"{settings.SIMULATION_PATH}/{simulation.uuid}.png"
     success = False
     if Path(image_path).is_file():
         with open(image_path, 'rb') as image_f:
             img_data = image_f.read()
         success = True
-    msg['Subject'] = 'Leeway Drift Simulation Result'
-    text = MIMEText(mail_result_text(simulation, success))
-    msg.attach(text)
+    # Initialize mail
+    email = EmailMessage(
+        subject='Leeway Drift Simulation Result',
+        body=mail_result_text(simulation, success),
+        to=[simulation.user.email]
+    )
+    # Attach result image
     if success:
-        image = MIMEImage(img_data, name=os.path.basename(image_path))
-        msg.attach(image)
-    return msg
+        email.attach(os.path.basename(image_path), img_data, 'image/png')
+    # Send email
+    return email.send()
 
 def mail_result_text(simulation, success):
     """
@@ -190,7 +176,7 @@ def mail_to_simulation(message):
     arguments = {**arguments_subject, **arguments_body, "user":user}
     simulation = LeewaySimulation(**arguments)
     simulation.save()
-    send_result_mail(simulation, 'confirmation_mail')
+    send_confirmation_mail(simulation)
     run_leeway_simulation(str(simulation.uuid))
 
 def parse_mail_arguments(text, delimiter=";"):
