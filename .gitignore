@@ -2,6 +2,7 @@ simulation/output/*.png
 simulation/output/*.nc
 simulation/input/*.nc
 .netrc
+opendrift_leeway_webgui/celerybeat-schedule.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
