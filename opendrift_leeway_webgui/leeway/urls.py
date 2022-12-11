@@ -5,4 +5,5 @@ from . import views
 
 urlpatterns = [
     path('', views.simulation_form, name='home'), # new
+    path('simulations/list/', views.simulations_list, name='simulations_list')
 ]

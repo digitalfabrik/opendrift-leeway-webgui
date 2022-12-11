@@ -4,14 +4,29 @@ Configure Celery workers
 import os
 from imaplib import IMAP4_SSL
 import email
-from celery import Celery
+import configparser
+
 from django.conf import settings
+from django.apps import apps
+from celery import Celery
 
 from .utils import mail_to_simulation
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendrift_leeway_webgui.core.settings')
 app = Celery('leeway')  # pylint: disable=invalid-name
 app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks()
+
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings"
+)
+
+# Read config from config file
+config = configparser.ConfigParser(interpolation=None)
+config.read("/etc/opendrift-leeway-webgui.ini")
+for section in config.sections():
+    for KEY, VALUE in config.items(section):
+        os.environ.setdefault(f"LEEWAY_{KEY.upper()}", VALUE)
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):  # pylint: disable=unused-argument
@@ -34,5 +49,3 @@ def check_mailbox():
         mail_to_simulation(email.message_from_bytes(data[0][1]))
     mailbox.close()
     mailbox.logout()
-
-app.autodiscover_tasks()

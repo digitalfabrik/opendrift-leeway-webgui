@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>List of Leeway Simulations</h2>
+<table border=0>
+  <tr>
+    <th>ID</th>
+    <th>Longitude</th>
+    <th>Latitude</th>
+    <th>Start Time</th>
+    <th>Duration</th>
+    <th>Radius</th>
+    <th>Result</th>
+  </tr>
+{% for simulation in simulations %}
+  <tr>
+    <td>{{ simulation.uuid }}</td>
+    <td>{{ simulation.longitude }}</td>
+    <td>{{ simulation.latitude }}</td>
+    <td>{{ simulation.start_time }}</td>
+    <td>{{ simulation.duration }}</td>
+    <td>{{ simulation.radius}}</td>
+    <td><a href="/media/output/{{ simulation.uuid }}.png">Image</a> <a href="/media/output/{{ simulation.uuid }}.nc">NetCDF</a></td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}
