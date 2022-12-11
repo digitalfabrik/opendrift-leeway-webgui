@@ -1,4 +1,5 @@
 simulation/output/*.png
+simulation/output/*.nc
 simulation/input/*.nc
 .netrc
 

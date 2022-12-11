@@ -73,7 +73,7 @@ print("Using sources:\n - {}".format("\n - ".join(SOURCES)))
 SIMULATION.add_readers_from_list(SOURCES,
                                  lazy=True)
 
-READER_LANDMASK = reader_global_landmask.Reader(extent=[0, 0, 360, 90])
+READER_LANDMASK = reader_global_landmask.Reader()
 SIMULATION.add_reader([READER_LANDMASK])
 
 SIMULATION.seed_elements(lon=ARGS.longitude,
@@ -82,8 +82,13 @@ SIMULATION.seed_elements(lon=ARGS.longitude,
                          number=ARGS.number, radius=ARGS.radius,
                          object_type=ARGS.object_type)
 
-SIMULATION.run(duration=timedelta(hours=ARGS.duration), time_step=600)
-
 OUTFILE = os.path.join("/code", "leeway", "output", ARGS.id)
-SIMULATION.plot(fast=True, legend=True, filename=OUTFILE)
+
+SIMULATION.run(duration=timedelta(hours=ARGS.duration),
+               time_step=600,
+               outfile="{}.nc".format(OUTFILE)
+              )
+SIMULATION.plot(fast=True, legend=True,
+                filename="{}.png".format(OUTFILE),
+                linecolor='age_seconds')
 print("{}.png written.".format(OUTFILE))

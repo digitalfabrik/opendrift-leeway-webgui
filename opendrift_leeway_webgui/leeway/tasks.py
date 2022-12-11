@@ -1,6 +1,6 @@
+import os
 import subprocess
-import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.apps import apps
 from django.conf import settings
@@ -36,3 +36,19 @@ def run_leeway_simulation(request_id):
     simulation.simulation_finished = datetime.now()
     send_result_mail(simulation)
     simulation.save()
+
+@app.task
+def clean_simulations():
+    """
+    Clean old simulations
+    """
+    print("Cleaing old simulation data.")
+    for simulation in (apps.get_model(app_label='leeway', model_name='LeewaySimulation').
+                       objects.filter(
+                           datetime.now()-timedelta(days=settings.SIMULATION_RETENTION))):
+        os.remove(os.path.join(
+            settings.SIMULATION_ROOT, "output", "{}.png".format(simulation.uuid)))
+        os.remove(os.path.join(
+            settings.SIMULATION_ROOT, "output", "{}.csv".format(simulation.uuid)))
+        print("Removed simulation {}.".format(simulation.uuid))
+        simulation.delete()

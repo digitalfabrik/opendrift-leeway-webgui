@@ -163,6 +163,8 @@ SIMULATION_ROOT = os.environ.get(
     "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR.parent, "simulation")
 )
 
+#: Number of days for keeping simulations and results.
+SIMULATION_RETENTION = int(os.environ.get("LEEWAY_SIMULATION_RETENTION", 7))
 
 ##########
 # CELERY #
