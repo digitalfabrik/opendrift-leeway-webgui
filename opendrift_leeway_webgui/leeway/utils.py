@@ -121,6 +121,7 @@ def send_result_mail(simulation):
     email = EmailMessage(
         subject='Leeway Drift Simulation Result',
         body=mail_result_text(simulation, success),
+        from_email=settings.EMAIL_HOST_USER,
         to=[simulation.user.email]
     )
     # Attach result image
