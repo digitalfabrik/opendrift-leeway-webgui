@@ -1,6 +1,6 @@
 # About
 
-This is a little Django web application that does an [OpenDrift](https://github.com/OpenDrift/opendrift) [Leeway](https://opendrift.github.io/choosing_a_model.html) simulation with a set of provided parameters via a web formular. The result is sent to a user via e-mail.
+This is a little Django web application that does an [OpenDrift](https://github.com/OpenDrift/opendrift) [Leeway](https://opendrift.github.io/choosing_a_model.html) simulation with a set of provided parameters via a web form. The result is sent to a user via e-mail.
 
 This is an experimental tool to help Search and Rescue operations. An experimental service is available at [leeway.tuerantuer.org](https://leeway.tuerantuer.org).
 
@@ -21,7 +21,7 @@ The program regularly fetches incoming mails via IMAP and starts simulations fro
    gh repo clone digitalfabrik/leeway
    cd leeway
    ```
-2. Create an virtual environment and activate it:
+2. Create a virtual environment and activate it:
    ```bash
    python3 -m venv .venv
    source .venv/bin/activate
@@ -30,7 +30,12 @@ The program regularly fetches incoming mails via IMAP and starts simulations fro
    ```bash
    pip install -e .
    ```
-4. Initialize the database:
+4. Create minimal config file `/etc/opendrift-leeway-webgui.ini` to enable `DEBUG` mode:
+   ```dosini
+   [base]
+   DEBUG = True
+   ```
+5. Initialize the database:
    ```bash
    cd opendrift_leeway_webgui
    python3 manage.py migrate
@@ -79,10 +84,11 @@ This details the installation on Debian with Apache2 and mod_wsgi.
    ```bash
    pip install opendrift-leeway-webgui
    ```
-4. Install Docker and add the `docker` group to the `www-data` user.
-5. Create symlink to facilitate the Apache configuration:
+4. Copy the example config file to `/etc/opendrift-leeway-webgui.ini` and fill in the template
+5. Install Docker and add the `docker` group to the `www-data` user.
+6. Create symlink to facilitate the Apache configuration:
    ```bash
    ln -s $(python -c "from opendrift_leeway_webgui.core import wsgi; print(wsgi.__file__)") .
    ```
-6. Configure Apache2 according to example.
-7. Set up Celery worker with `leeway-celery.service` and start the service.
+7. Configure Apache2 according to the example.
+8. Set up Celery worker with `leeway-celery.service` and start the service.

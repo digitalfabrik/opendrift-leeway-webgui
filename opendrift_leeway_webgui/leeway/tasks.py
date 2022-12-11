@@ -21,7 +21,7 @@ def run_leeway_simulation(request_id):
     simulation.simulation_started = datetime.now()
     simulation.save()
     params = ["docker", "run", "--volume",
-              "{}:/code/leeway".format(settings.SIMULATION_PATH),
+              "{}:/code/leeway".format(settings.SIMULATION_ROOT),
               "opendrift/opendrift",
               "python3", "leeway/simulation.py",
               "--longitude", str(simulation.longitude),
