@@ -3,7 +3,8 @@ Wrapper/Helper script for Leeway simulations with OpenDrift.
 
 Use it with the docker container by mounting a directory and copying the file to it:
 
-    docker run -it --volume ./workdir:/code/leeway opendrift/opendrift python3 leeway/simulation.py --longitude 11.9545 --latitude 35.2966 --start-time "2022-12-05 03:00" --duration 12
+docker run -it --volume ./simulation:/code/leeway opendrift/opendrift python3 leeway/simulation.py\
+    --longitude 11.9545 --latitude 35.2966 --start-time "2022-12-05 03:00" --duration 12
 """
 import argparse
 import uuid
@@ -47,13 +48,30 @@ PARSER.add_argument('--radius',
 PARSER.add_argument('--id',
                     help='ID used for result image name.',
                     default=str(uuid.uuid4()))
+PARSER.add_argument('--no-web',
+                    help='Disable fetching simulation data from web.',
+                    action='store_true',
+                    default=False)
 ARGS = PARSER.parse_args()
 
 SIMULATION = Leeway(loglevel=50)
 
-SIMULATION.add_readers_from_list(['https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest',
-                                  'https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd'],
-                                 lazy=False)
+SOURCES = []
+
+INPUTDIR = "/code/leeway/input"
+for data_file in os.listdir(INPUTDIR):
+    if data_file.endswith(".nc"):
+        SOURCES.append(os.path.join(INPUTDIR, data_file))
+
+if not ARGS.no_web:
+    SOURCES.append('https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest')
+    SOURCES.append(('https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/'
+                    'ncep_global/NCEP_Global_Atmospheric_Model_best.ncd'))
+
+print("Using sources:\n - {}".format("\n - ".join(SOURCES)))
+
+SIMULATION.add_readers_from_list(SOURCES,
+                                 lazy=True)
 
 READER_LANDMASK = reader_global_landmask.Reader(extent=[0, 0, 360, 90])
 SIMULATION.add_reader([READER_LANDMASK])
@@ -66,4 +84,6 @@ SIMULATION.seed_elements(lon=ARGS.longitude,
 
 SIMULATION.run(duration=timedelta(hours=ARGS.duration), time_step=600)
 
-SIMULATION.plot(fast=True, legend=True, filename=os.path.join("/code", "leeway", ARGS.id))
+OUTFILE = os.path.join("/code", "leeway", "output", ARGS.id)
+SIMULATION.plot(fast=True, legend=True, filename=OUTFILE)
+print("{}.png written.".format(OUTFILE))
