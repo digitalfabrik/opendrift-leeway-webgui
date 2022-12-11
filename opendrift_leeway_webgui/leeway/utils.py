@@ -102,7 +102,7 @@ def send_confirmation_mail(simulation):
         'Leeway Drift Simulation Order received',
         f'Request saved. You will receive an e-mail to {simulation.user.email} '
         f'when the simulation is finished. Your request ID is {simulation.uuid}.',
-        None,
+        settings.EMAIL_HOST_USER,
         [simulation.user.email],
     )
 
