@@ -28,7 +28,7 @@ The program regularly fetches incoming mails via IMAP and starts simulations fro
    ```
 3. Install the dependencies:
    ```bash
-   pip install -e .
+   pip install -e .[dev]
    ```
 4. Create minimal config file `/etc/opendrift-leeway-webgui.ini` to enable `DEBUG` mode:
    ```dosini
@@ -60,9 +60,13 @@ The program regularly fetches incoming mails via IMAP and starts simulations fro
 
 # Releasing
 
+Run `bumpver update` to perform the following tasks with one command:
+
 1. Bump the version in `pyproject.toml`
-2. Commit and push your changes: `git commit -m "Bump version to <version>" && git push`
-3. Tag your commit and push: `git tag <version> && git push origin <version>`
+2. Create a version bump commit
+3. Create a new version tag
+4. Push the commit and tag
+5. Create a new release on PyPI via GitHub Actions
 
 
 # Production Server
