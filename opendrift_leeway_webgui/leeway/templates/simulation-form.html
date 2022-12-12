@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>New Leeway Simulation</h2>
-<p>Please note that only simulations +/- 5 days from now are possible.</p>
-<form method="post">
-  <table>
-  {% csrf_token %}
-  {{ form.as_table }}
-  </table>
-  <button type="submit">Simulate</button>
-</form>
+    <h2>New Leeway Simulation</h2>
+    <p>Please note that only simulations +/- 5 days from now are possible.</p>
+    <form method="post">
+        <table>
+            {% csrf_token %}
+            {{ form.as_table }}
+        </table>
+        <button type="submit">Simulate</button>
+    </form>
 {% endblock %}
