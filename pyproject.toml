@@ -24,6 +24,11 @@ dependencies = [
     "redis",
 ]
 
+[project.urls]
+"Homepage" = "https://leeway.tuerantuer.org"
+"Bug Tracker" = "https://github.com/digitalfabrik/opendrift-leeway-webgui/issues"
+"Source Code" = "https://github.com/digitalfabrik/opendrift-leeway-webgui"
+
 [project.optional-dependencies]
 dev = [
     "bumpver",
