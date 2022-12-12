@@ -47,8 +47,8 @@ def clean_simulations():
                        objects.filter(
                            datetime.now()-timedelta(days=settings.SIMULATION_RETENTION))):
         os.remove(os.path.join(
-            settings.SIMULATION_ROOT, "output", "{}.png".format(simulation.uuid)))
+            settings.SIMULATION_OUTPUT, f"{simulation.uuid}.png"))
         os.remove(os.path.join(
-            settings.SIMULATION_ROOT, "output", "{}.csv".format(simulation.uuid)))
+            settings.SIMULATION_OUTPUT, f"{simulation.uuid}.csv"))
         print("Removed simulation {}.".format(simulation.uuid))
         simulation.delete()

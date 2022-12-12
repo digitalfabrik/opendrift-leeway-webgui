@@ -163,6 +163,9 @@ SIMULATION_ROOT = os.environ.get(
     "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR.parent, "simulation")
 )
 
+#: The output path of simulation results
+SIMULATION_OUTPUT = os.path.join(SIMULATION_ROOT, "output")
+
 #: Number of days for keeping simulations and results.
 SIMULATION_RETENTION = int(os.environ.get("LEEWAY_SIMULATION_RETENTION", 7))
 

@@ -111,7 +111,7 @@ def send_result_mail(simulation):
     Create mail parts for result mail
     """
     # Try to open simulation result image
-    image_path = f"{settings.SIMULATION_ROOT}/output/{simulation.uuid}.png"
+    image_path = os.path.join(settings.SIMULATION_OUTPUT, f"{simulation.uuid}.png")
     success = False
     if Path(image_path).is_file():
         with open(image_path, 'rb') as image_f:
