@@ -25,7 +25,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["bumpver", "pre-commit"]
+dev = [
+    "bumpver",
+    "pre-commit",
+    "pylint",
+    "pylint-django",
+]
 
 [tool.setuptools.packages.find]
 include = ["opendrift_leeway_webgui*"]
@@ -52,3 +57,27 @@ known_first_party = "opendrift_leeway_webgui"
 include_trailing_comma = true
 line_length            = 88
 multi_line_output      = 3
+
+[tool.pylint.main]
+jobs = 0
+load-plugins = [
+    "pylint_django",
+    "pylint.extensions.emptystring",
+    "pylint.extensions.comparetozero",
+    "pylint.extensions.comparison_placement",
+    "pylint.extensions.for_any_all",
+    "pylint.extensions.consider_ternary_expression",
+]
+django-settings-module="opendrift_leeway_webgui.core.settings"
+
+[tool.pylint.messages_control]
+disable = [
+  "missing-module-docstring",
+]
+enable = ["useless-suppression"]
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.reports]
+output-format = "colorized"

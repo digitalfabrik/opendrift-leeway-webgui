@@ -26,7 +26,7 @@ class LeewaySimulationForm(ModelForm):
             widget=TextInput(attrs={"placeholder": "34° 47' 49.1166\""}),
         )
 
-    class Meta:  # pylint: disable=too-few-public-methods
+    class Meta:
         """
         Configure form fields and help text.
         """
