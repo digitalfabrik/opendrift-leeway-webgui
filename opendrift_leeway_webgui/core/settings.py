@@ -11,6 +11,8 @@ import os
 from distutils.util import strtobool
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 
 ###################
 # CUSTOM SETTINGS #
@@ -214,6 +216,11 @@ EMAIL_HOST = os.environ.get("LEEWAY_EMAIL_HOST", "localhost")
 #: Password to use for the SMTP server defined in :attr:`~LEEWAY.core.settings.EMAIL_HOST`
 #: (see :setting:`django:EMAIL_HOST_PASSWORD`). If empty, Django won’t attempt authentication.
 EMAIL_HOST_PASSWORD = os.environ.get("LEEWAY_EMAIL_HOST_PASSWORD")
+
+if EMAIL_HOST_PASSWORD and not SERVER_EMAIL:
+    raise ImproperlyConfigured(
+        "You have set an `EMAIL_HOST_PASSWORD`, but `SERVER_EMAIL` is missing."
+    )
 
 #: Username to use for the SMTP server defined in :attr:`~LEEWAY.core.settings.EMAIL_HOST`
 #: (see :setting:`django:EMAIL_HOST_USER`). If empty, Django won’t attempt authentication.
