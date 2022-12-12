@@ -102,7 +102,7 @@ def send_confirmation_mail(simulation):
         'Leeway Drift Simulation Order received',
         f'Request saved. You will receive an e-mail to {simulation.user.email} '
         f'when the simulation is finished. Your request ID is {simulation.uuid}.',
-        settings.EMAIL_HOST_USER,
+        None,
         [simulation.user.email],
     )
 
@@ -121,7 +121,6 @@ def send_result_mail(simulation):
     email = EmailMessage(
         subject='Leeway Drift Simulation Result',
         body=mail_result_text(simulation, success),
-        from_email=settings.EMAIL_HOST_USER,
         to=[simulation.user.email]
     )
     # Attach result image
