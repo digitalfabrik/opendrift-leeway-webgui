@@ -158,6 +158,9 @@ STATIC_URL = "/static/"
 #: In debug mode, this is not required since :mod:`django.contrib.staticfiles` can directly serve these files.
 STATIC_ROOT = os.environ.get("LEEWAY_STATIC_ROOT")
 
+#: URL where simulations are served
+SIMULATION_URL = "/simulations/"
+
 #: The path where simulation results are stored
 SIMULATION_ROOT = os.environ.get(
     "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR.parent, "simulation")
