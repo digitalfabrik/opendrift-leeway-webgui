@@ -25,7 +25,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["bumpver"]
+dev = ["bumpver", "pre-commit"]
 
 [tool.setuptools.packages.find]
 include = ["opendrift_leeway_webgui*"]
@@ -43,3 +43,9 @@ push = true
     'current_version = "{version}"',
     'version = "{version}"',
 ]
+
+[tool.isort]
+known_first_party = "opendrift_leeway_webgui"
+include_trailing_comma = true
+line_length            = 88
+multi_line_output      = 3
