@@ -1,5 +1,6 @@
 [![PyPi](https://img.shields.io/pypi/v/opendrift-leeway-webgui.svg)](https://pypi.org/project/opendrift-leeway-webgui/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # About
 

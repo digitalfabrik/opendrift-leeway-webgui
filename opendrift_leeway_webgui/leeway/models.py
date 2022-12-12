@@ -12,11 +12,9 @@ class LeewaySimulation(models.Model):
     """
     Required information for simulation run
     """
+
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     longitude = models.FloatField()
     latitude = models.FloatField()
     start_time = models.DateTimeField(default=datetime.now)
@@ -30,4 +28,4 @@ class LeewaySimulation(models.Model):
         return "{} {}".format(self.uuid, self.user.email)
 
     class Meta:
-        app_label="leeway"
+        app_label = "leeway"
