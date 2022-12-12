@@ -7,3 +7,15 @@ repos:
     rev: 5.10.1
     hooks:
       - id: isort
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args:
+          [
+            "--reports=n",
+            "--score=n",
+          ]
