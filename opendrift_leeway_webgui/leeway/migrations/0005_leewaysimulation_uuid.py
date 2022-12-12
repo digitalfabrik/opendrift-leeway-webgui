@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('leeway', '0004_leewaysimulation_simulation_finished'),
-    ]
+    dependencies = [("leeway", "0004_leewaysimulation_simulation_finished")]
 
     operations = [
         migrations.AddField(
-            model_name='leewaysimulation',
-            name='uuid',
+            model_name="leewaysimulation",
+            name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False),
-        ),
+        )
     ]

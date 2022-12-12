@@ -14,24 +14,23 @@ def simulation_form(request):
     Form to start new simulation
     """
     if request.method == "POST":
-        lwform = LeewaySimulationForm(
-            request.POST
-        )
+        lwform = LeewaySimulationForm(request.POST)
         lwform.instance.user = request.user
         if lwform.is_valid():
             lwform.save()
             messages.add_message(
                 request,
                 messages.INFO,
-                ('Request saved. You will receive an e-mail to {} when the simulation is finished. '
-                 'Your request ID is {}.').format(
-                     request.user.email, lwform.instance.uuid
-                 )
+                (
+                    "Request saved. You will receive an e-mail to {} when the simulation is finished. "
+                    "Your request ID is {}."
+                ).format(request.user.email, lwform.instance.uuid),
             )
             run_leeway_simulation.apply_async([lwform.instance.uuid])
 
-    context = {'form': LeewaySimulationForm()}
+    context = {"form": LeewaySimulationForm()}
     return render(request, context=context, template_name="simulation-form.html")
+
 
 @login_required
 def simulations_list(request):
@@ -44,5 +43,5 @@ def simulations_list(request):
             "SIMULATION_URL": settings.SIMULATION_URL,
             "simulations": LeewaySimulation.objects.filter(user=request.user),
         },
-        template_name="simulations-list.html"
+        template_name="simulations-list.html",
     )

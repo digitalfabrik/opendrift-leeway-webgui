@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('leeway', '0003_leewaysimulation_user'),
-    ]
+    dependencies = [("leeway", "0003_leewaysimulation_user")]
 
     operations = [
         migrations.AddField(
-            model_name='leewaysimulation',
-            name='simulation_finished',
+            model_name="leewaysimulation",
+            name="simulation_finished",
             field=models.DateTimeField(null=True),
-        ),
+        )
     ]

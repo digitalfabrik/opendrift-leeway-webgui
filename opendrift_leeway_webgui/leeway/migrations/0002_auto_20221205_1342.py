@@ -7,19 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('leeway', '0001_initial'),
-    ]
+    dependencies = [("leeway", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='leewaysimulation',
-            name='simulation_started',
+            model_name="leewaysimulation",
+            name="simulation_started",
             field=models.DateTimeField(null=True),
         ),
         migrations.AlterField(
-            model_name='leewaysimulation',
-            name='start_time',
+            model_name="leewaysimulation",
+            name="start_time",
             field=models.DateTimeField(default=datetime.datetime.now),
         ),
     ]

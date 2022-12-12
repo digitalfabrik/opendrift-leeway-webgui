@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('leeway', '0005_leewaysimulation_uuid'),
-    ]
+    dependencies = [("leeway", "0005_leewaysimulation_uuid")]
 
     operations = [
         migrations.AddField(
-            model_name='leewaysimulation',
-            name='radius',
+            model_name="leewaysimulation",
+            name="radius",
             field=models.IntegerField(default=1000),
-        ),
+        )
     ]
