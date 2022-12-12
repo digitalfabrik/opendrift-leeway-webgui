@@ -1,3 +1,6 @@
+[![PyPi](https://img.shields.io/pypi/v/opendrift-leeway-webgui.svg)](https://pypi.org/project/opendrift-leeway-webgui/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 # About
 
 This is a little Django web application that does an [OpenDrift](https://github.com/OpenDrift/opendrift) [Leeway](https://opendrift.github.io/choosing_a_model.html) simulation with a set of provided parameters via a web form. The result is sent to a user via e-mail.
