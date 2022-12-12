@@ -1,11 +1,12 @@
 from django.conf import settings
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
-from .models import LeewaySimulation
 from .forms import LeewaySimulationForm
+from .models import LeewaySimulation
 from .tasks import run_leeway_simulation
+
 
 @login_required
 def simulation_form(request):

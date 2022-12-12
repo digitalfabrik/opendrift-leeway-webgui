@@ -1,11 +1,11 @@
-from django.db import models
-from datetime import datetime
 import uuid
+from datetime import datetime
 
 from django.conf import settings
 from django.db import models
 
 from .utils import LEEWAY_OBJECT_TYPES
+
 
 # Create your models here.
 class LeewaySimulation(models.Model):

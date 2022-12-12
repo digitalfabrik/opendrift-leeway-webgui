@@ -162,6 +162,7 @@ def mail_to_simulation(message):
     Parse content of incoming mail and create a simulation and a response
     """
     from django.contrib.auth.models import User
+
     from .tasks import run_leeway_simulation
     LeewaySimulation = apps.get_model(app_label='leeway', model_name='LeewaySimulation')
     from_addr = message.get('From')

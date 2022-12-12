@@ -2,13 +2,13 @@ import os
 import subprocess
 from datetime import datetime, timedelta
 
+from celery import shared_task
 from django.apps import apps
 from django.conf import settings
-from celery import shared_task
 
 from .celery import app
-
 from .utils import send_result_mail
+
 
 @app.task
 def run_leeway_simulation(request_id):
