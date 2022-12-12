@@ -7,13 +7,12 @@ import os
 from imaplib import IMAP4_SSL
 
 from celery import Celery
-from django.apps import apps
 from django.conf import settings
 
 from .utils import mail_to_simulation
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings")
-app = Celery("leeway")  # pylint: disable=invalid-name
+app = Celery("leeway")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
@@ -28,7 +27,7 @@ for section in config.sections():
 
 
 @app.on_after_configure.connect
-def setup_periodic_tasks(sender, **kwargs):  # pylint: disable=unused-argument
+def setup_periodic_tasks(sender, **kwargs):
     """
     Set up periodic tasks, i.e. retrieving mails from the mailbox
     """
@@ -43,7 +42,8 @@ def check_mailbox():
     mailbox = IMAP4_SSL(host=settings.EMAIL_HOST)
     mailbox.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
     mailbox.select("Inbox")
-    typ, data = mailbox.search(None, "UNSEEN")  # pylint: disable=unused-variable
+    # pylint: disable=unused-variable
+    typ, data = mailbox.search(None, "UNSEEN")
     for num in data[0].split():
         typ, data = mailbox.fetch(num, "(RFC822)")
         mail_to_simulation(email.message_from_bytes(data[0][1]))

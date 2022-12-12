@@ -22,9 +22,9 @@ def simulation_form(request):
                 request,
                 messages.INFO,
                 (
-                    "Request saved. You will receive an e-mail to {} when the simulation is finished. "
-                    "Your request ID is {}."
-                ).format(request.user.email, lwform.instance.uuid),
+                    f"Request saved. You will receive an e-mail to {request.user.email} when "
+                    f"the simulation is finished. Your request ID is {lwform.instance.uuid}."
+                ),
             )
             run_leeway_simulation.apply_async([lwform.instance.uuid])
 

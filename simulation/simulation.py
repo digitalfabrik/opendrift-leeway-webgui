@@ -6,13 +6,15 @@ Use it with the docker container by mounting a directory and copying the file to
 docker run -it --volume ./simulation:/code/leeway opendrift/opendrift python3 leeway/simulation.py\
     --longitude 11.9545 --latitude 35.2966 --start-time "2022-12-05 03:00" --duration 12
 """
+
 import argparse
 import os
 import uuid
 from datetime import datetime, timedelta
 
+# pylint: disable=import-error
 from opendrift.models.leeway import Leeway
-from opendrift.readers import reader_global_landmask, reader_netCDF_CF_generic
+from opendrift.readers import reader_global_landmask
 
 PARSER = argparse.ArgumentParser(description="Simulate drift of object")
 PARSER.add_argument(
@@ -66,19 +68,18 @@ ARGS = PARSER.parse_args()
 
 SIMULATION = Leeway(loglevel=50)
 
-SOURCES = []
-
 INPUTDIR = "/code/leeway/input"
-for data_file in os.listdir(INPUTDIR):
-    if data_file.endswith(".nc"):
-        SOURCES.append(os.path.join(INPUTDIR, data_file))
+SOURCES = [
+    os.path.join(INPUTDIR, data_file)
+    for data_file in os.listdir(INPUTDIR)
+    if data_file.endswith(".nc")
+]
 
 if not ARGS.no_web:
-    SOURCES.append("https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest")
-    SOURCES.append(
+    SOURCES.extend(
         (
-            "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/"
-            "ncep_global/NCEP_Global_Atmospheric_Model_best.ncd"
+            "https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest",
+            "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
         )
     )
 
@@ -101,11 +102,9 @@ SIMULATION.seed_elements(
 OUTFILE = os.path.join("/code", "leeway", "output", ARGS.id)
 
 SIMULATION.run(
-    duration=timedelta(hours=ARGS.duration),
-    time_step=600,
-    outfile="{}.nc".format(OUTFILE),
+    duration=timedelta(hours=ARGS.duration), time_step=600, outfile=f"{OUTFILE}.nc"
 )
 SIMULATION.plot(
-    fast=True, legend=True, filename="{}.png".format(OUTFILE), linecolor="age_seconds"
+    fast=True, legend=True, filename=f"{OUTFILE}.png", linecolor="age_seconds"
 )
-print("{}.png written.".format(OUTFILE))
+print(f"{OUTFILE}.png written.")

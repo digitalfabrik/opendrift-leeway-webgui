@@ -2,11 +2,11 @@
 Utilities
 """
 import os
-import sys
 from pathlib import Path
 
 from django.apps import apps
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage, send_mail
 from dms2dec.dms_convert import dms2dec
 
@@ -181,28 +181,16 @@ def mail_result_text(simulation, success):
     """
     Create a result mail text
     """
-    if success:
-        text = "Find the image attached."
-    else:
-        text = "The simulation failed."
+    text = "Find the image attached." if success else "The simulation failed."
     return (
-        "Your request with ID {uuid} has been processed. {text}\n\n"
+        f"Your request with ID {simulation.uuid} has been processed. {text}\n\n"
         "Simulation parameters:\n"
-        "- Longitude: {longitude}\n"
-        "- Latitude: {latitude}\n"
-        "- Radius: {radius}\n"
-        "- Start time: {start_time}\n"
-        "- Duration: {duration}\n"
-        "- Object type: {object_type}\n"
-    ).format(
-        text=text,
-        uuid=simulation.uuid,
-        longitude=simulation.longitude,
-        latitude=simulation.latitude,
-        radius=simulation.radius,
-        start_time=simulation.start_time,
-        duration=simulation.duration,
-        object_type=simulation.object_type,
+        f"- Longitude: {simulation.longitude}\n"
+        f"- Latitude: {simulation.latitude}\n"
+        f"- Radius: {simulation.radius}\n"
+        f"- Start time: {simulation.start_time}\n"
+        f"- Duration: {simulation.duration}\n"
+        f"- Object type: {simulation.object_type}\n"
     )
 
 
@@ -210,16 +198,16 @@ def mail_to_simulation(message):
     """
     Parse content of incoming mail and create a simulation and a response
     """
-    from django.contrib.auth.models import User
-
+    # pylint: disable=import-outside-toplevel
     from .tasks import run_leeway_simulation
 
+    # pylint: disable=invalid-name
     LeewaySimulation = apps.get_model(app_label="leeway", model_name="LeewaySimulation")
     from_addr = message.get("From")
     if "<" in from_addr and ">" in from_addr:
         from_addr = from_addr.split("<")[1].rstrip(">")
     try:
-        user = User.objects.get(email=from_addr)
+        user = get_user_model().objects.get(email=from_addr)
     except user.DoesNotExist:
         return
     arguments_subject = parse_mail_arguments(message.get("Subject"))

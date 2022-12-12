@@ -17,14 +17,15 @@ def read_config():
     config = configparser.ConfigParser(interpolation=None)
     config.read("/etc/opendrift-leeway-webgui.ini")
     for section in config.sections():
-        for KEY, VALUE in config.items(section):
-            os.environ.setdefault(f"LEEWAY_{KEY.upper()}", VALUE)
+        for key, value in config.items(section):
+            os.environ.setdefault(f"LEEWAY_{key.upper()}", value)
 
 
 def main():
     """Run administrative tasks."""
     read_config()
     try:
+        # pylint: disable=import-outside-toplevel
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(

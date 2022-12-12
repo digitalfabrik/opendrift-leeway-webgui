@@ -34,8 +34,8 @@ def application(environ, start_response):
     config = configparser.ConfigParser(interpolation=None)
     config.read("/etc/opendrift-leeway-webgui.ini")
     for section in config.sections():
-        for KEY, VALUE in config.items(section):
-            os.environ.setdefault(f"LEEWAY_{KEY.upper()}", VALUE)
+        for key, value in config.items(section):
+            os.environ.setdefault(f"LEEWAY_{key.upper()}", value)
 
     # Read config from environment
     for key in environ:

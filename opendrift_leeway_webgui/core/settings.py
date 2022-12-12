@@ -8,10 +8,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
-from distutils.util import strtobool
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
+
+from .utils import strtobool
 
 ###################
 # CUSTOM SETTINGS #
@@ -185,10 +186,12 @@ CELERY_TIMEZONE = "UTC"
 #: If True the task will report its status as ``started`` when the task is executed by a worker.
 #: The default value is False as the normal behavior is to not report that level of granularity.
 #: Tasks are either pending, finished, or waiting to be retried.
-#: Having a ``started`` state can be useful for when there are long running tasks and there’s a need to report what task is currently running.
+#: Having a ``started`` state can be useful for when there are long running tasks
+#: and there’s a need to report what task is currently running.
 CELERY_TASK_TRACK_STARTED = True
 
-#: Task hard time limit in seconds. The worker processing the task will be killed and replaced with a new one when this is exceeded.
+#: Task hard time limit in seconds. The worker processing the task will be killed
+#: and replaced with a new one when this is exceeded.
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
 #: Default broker URL.
@@ -202,6 +205,7 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 # EMAILS #
 ##########
 
+# pylint: disable=consider-ternary-expression
 if DEBUG:
     #: The backend to use for sending emails (see :setting:`django:EMAIL_BACKEND` and :doc:`django:topics/email`)
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
