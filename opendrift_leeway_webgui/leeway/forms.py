@@ -1,10 +1,11 @@
 """
 Forms for the web GUI
 """
-from django.forms import ModelForm, CharField, TextInput
+from django.forms import CharField, ModelForm, TextInput
 
 from .models import LeewaySimulation
 from .utils import normalize_dms2dec
+
 
 class LeewaySimulationForm(ModelForm):
     """

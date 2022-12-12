@@ -13,7 +13,6 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
-
 ###################
 # CUSTOM SETTINGS #
 ###################

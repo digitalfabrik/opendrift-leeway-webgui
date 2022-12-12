@@ -7,15 +7,12 @@ docker run -it --volume ./simulation:/code/leeway opendrift/opendrift python3 le
     --longitude 11.9545 --latitude 35.2966 --start-time "2022-12-05 03:00" --duration 12
 """
 import argparse
-import uuid
 import os
-
+import uuid
 from datetime import datetime, timedelta
 
 from opendrift.models.leeway import Leeway
-
-from opendrift.readers import reader_netCDF_CF_generic
-from opendrift.readers import reader_global_landmask
+from opendrift.readers import reader_global_landmask, reader_netCDF_CF_generic
 
 PARSER = argparse.ArgumentParser(description='Simulate drift of object')
 PARSER.add_argument('--longitude',

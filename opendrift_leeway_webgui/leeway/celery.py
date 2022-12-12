@@ -1,14 +1,14 @@
 """
 Configure Celery workers
 """
+import configparser
+import email
 import os
 from imaplib import IMAP4_SSL
-import email
-import configparser
 
-from django.conf import settings
-from django.apps import apps
 from celery import Celery
+from django.apps import apps
+from django.conf import settings
 
 from .utils import mail_to_simulation
 
