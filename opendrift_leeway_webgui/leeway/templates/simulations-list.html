@@ -19,7 +19,7 @@
     <td>{{ simulation.start_time }}</td>
     <td>{{ simulation.duration }}</td>
     <td>{{ simulation.radius}}</td>
-    <td><a href="/media/output/{{ simulation.uuid }}.png">Image</a> <a href="/media/output/{{ simulation.uuid }}.nc">NetCDF</a></td>
+    <td><a href="{{ SIMULATION_URL }}{{ simulation.uuid }}.png">Image</a> <a href="{{ SIMULATION_URL }}{{ simulation.uuid }}.nc">NetCDF</a></td>
   </tr>
 {% endfor %}
 </table>
