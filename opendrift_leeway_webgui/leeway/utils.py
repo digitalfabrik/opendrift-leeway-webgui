@@ -1,11 +1,7 @@
 """
 Utilities
 """
-import os
-from pathlib import Path
-
 from django.apps import apps
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage, send_mail
 from dms2dec.dms_convert import dms2dec
@@ -157,31 +153,24 @@ def send_result_mail(simulation):
     """
     Create mail parts for result mail
     """
-    # Try to open simulation result image
-    image_path = os.path.join(settings.SIMULATION_OUTPUT, f"{simulation.uuid}.png")
-    success = False
-    if Path(image_path).is_file():
-        with open(image_path, "rb") as image_f:
-            img_data = image_f.read()
-        success = True
     # Initialize mail
     email = EmailMessage(
         subject="Leeway Drift Simulation Result",
-        body=mail_result_text(simulation, success),
+        body=mail_result_text(simulation),
         to=[simulation.user.email],
     )
     # Attach result image
-    if success:
-        email.attach(os.path.basename(image_path), img_data, "image/png")
+    if simulation.img:
+        email.attach_file(simulation.img.path)
     # Send email
     return email.send()
 
 
-def mail_result_text(simulation, success):
+def mail_result_text(simulation):
     """
     Create a result mail text
     """
-    text = "Find the image attached." if success else "The simulation failed."
+    text = "Find the image attached." if simulation.img else "The simulation failed."
     return (
         f"Your request with ID {simulation.uuid} has been processed. {text}\n\n"
         "Simulation parameters:\n"

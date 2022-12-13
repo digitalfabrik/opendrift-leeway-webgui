@@ -20,7 +20,8 @@
                 <td>{{ simulation.duration }}</td>
                 <td>{{ simulation.radius }}</td>
                 <td>
-                    <a href="{{ SIMULATION_URL }}{{ simulation.uuid }}.png">Image</a> <a href="{{ SIMULATION_URL }}{{ simulation.uuid }}.nc">NetCDF</a>
+                    {% if simulation.img %}<a href="{{ simulation.img.url }}">Image</a>{% endif %}
+                    {% if simulation.netcdf %}<a href="{{ simulation.netcdf.url }}">NetCDF</a>{% endif %}
                 </td>
             </tr>
         {% endfor %}
