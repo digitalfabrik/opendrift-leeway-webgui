@@ -7,6 +7,15 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
       - uses: psf/black@stable
+  djlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - name: Install djlint
+        run: pip install djlint
+      - name: Run djlint
+        run: djlint --check --lint opendrift_leeway_webgui
   isort:
     runs-on: ubuntu-latest
     steps:
@@ -14,7 +23,7 @@ jobs:
       - uses: actions/setup-python@v4
       - uses: jamescurtin/isort-action@master
         with:
-            configuration: --check-only
+          configuration: --check-only
   pylint:
     runs-on: ubuntu-latest
     steps:

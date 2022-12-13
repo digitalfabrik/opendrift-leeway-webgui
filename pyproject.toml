@@ -57,6 +57,9 @@ push = true
     'version = "{version}"',
 ]
 
+[tool.djlint]
+profile="django"
+
 [tool.isort]
 known_first_party = "opendrift_leeway_webgui"
 include_trailing_comma = true

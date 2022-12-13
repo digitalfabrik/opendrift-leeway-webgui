@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Log In</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Log In</button>
-  <p>If you need access, contact tech@integreat-app.de.</p>
-</form>
-{% endblock %}
+    <h2>Log In</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Log In</button>
+        <p>If you need access, contact tech@integreat-app.de.</p>
+    </form>
+{% endblock content %}
