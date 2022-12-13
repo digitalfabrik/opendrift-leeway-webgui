@@ -1,6 +1,6 @@
-simulation/output/*.png
-simulation/output/*.nc
-simulation/input/*.nc
+opendrift_leeway_webgui/simulation/output/*.png
+opendrift_leeway_webgui/simulation/output/*.nc
+opendrift_leeway_webgui/simulation/input/*.nc
 .netrc
 opendrift_leeway_webgui/celerybeat-schedule.db
 
