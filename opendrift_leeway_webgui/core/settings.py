@@ -18,8 +18,11 @@ from .utils import strtobool
 # CUSTOM SETTINGS #
 ###################
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+#: Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+#: The path to the simulation script passed to the opendrift docker container
+SIMULATION_SCRIPT_PATH = BASE_DIR / "simulation" / "simulation.py"
 
 #: Number of drifters simulated
 OPENDRIFT_NUMBER_DRIFTERS = int(os.environ.get("LEEWAY_OPENDRIFT_NUMBER_DRIFTERS", 100))
@@ -165,7 +168,7 @@ SIMULATION_URL = "/simulations/"
 
 #: The path where simulation results are stored
 SIMULATION_ROOT = os.environ.get(
-    "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR.parent, "simulation")
+    "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR, "simulation")
 )
 
 #: The output path of simulation results
