@@ -13,7 +13,7 @@ from . import views
 #: The url patterns of this module (see :doc:`django:topics/http/urls`)
 urlpatterns = [
     path("", views.simulation_form, name="home"),  # new
-    path("simulations/list/", views.simulations_list, name="simulations_list"),
+    path("list/", views.simulations_list, name="simulations_list"),
 ]
 
 # Serve simulation files in debug mode
