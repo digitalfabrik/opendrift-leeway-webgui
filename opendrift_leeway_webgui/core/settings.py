@@ -285,12 +285,12 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 # EMAILS #
 ##########
 
-# pylint: disable=consider-ternary-expression
-if DEBUG:
-    #: The backend to use for sending emails (see :setting:`django:EMAIL_BACKEND` and :doc:`django:topics/email`)
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#: The backend to use for sending emails (see :setting:`django:EMAIL_BACKEND` and :doc:`django:topics/email`)
+EMAIL_BACKEND = (
+    "django.core.mail.backends."
+    + os.environ.get("LEEWAY_EMAIL_BACKEND", "console" if DEBUG else "smtp")
+    + ".EmailBackend"
+)
 
 #: The email address that error messages come from (see :setting:`django:SERVER_EMAIL`)
 SERVER_EMAIL = os.environ.get("LEEWAY_SERVER_EMAIL")
