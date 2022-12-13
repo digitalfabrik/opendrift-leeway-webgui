@@ -38,6 +38,8 @@ def run_leeway_simulation(request_id):
         str(settings.OPENDRIFT_NUMBER_DRIFTERS),
         "--start-time",
         str(simulation.start_time.strftime("%Y-%m-%d %H:%M")),
+        "--object-type",
+        str(simulation.object_type),
         "--duration",
         str(simulation.duration),
         "--id",
