@@ -170,7 +170,11 @@ def mail_result_text(simulation):
     """
     Create a result mail text
     """
-    text = "Find the image attached." if simulation.img else "The simulation failed."
+    text = (
+        "Find the image attached."
+        if simulation.img
+        else f"The simulation failed:\n\n{simulation.error}"
+    )
     return (
         f"Your request with ID {simulation.uuid} has been processed. {text}\n\n"
         "Simulation parameters:\n"

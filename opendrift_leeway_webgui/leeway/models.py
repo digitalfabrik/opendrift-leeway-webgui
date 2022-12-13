@@ -41,6 +41,14 @@ class LeewaySimulation(models.Model):
     netcdf = models.FileField(
         null=True, storage=simulation_storage, verbose_name=_("NetCDF file")
     )
+    traceback = models.TextField(blank=True, verbose_name=_("traceback"))
+
+    @property
+    def error(self):
+        """
+        The last line of the traceback, usually the error message.
+        """
+        return self.traceback.splitlines()[-1] if self.traceback else None
 
     def __str__(self):
         # pylint: disable=no-member

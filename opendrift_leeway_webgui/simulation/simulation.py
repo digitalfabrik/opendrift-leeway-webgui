@@ -110,7 +110,7 @@ def main():
     simulation.plot(
         fast=True, legend=True, filename=f"{outfile}.png", linecolor="age_seconds"
     )
-    print(f"{outfile}.png written.")
+    print(f"Success: {outfile}.png written.")
 
 
 if __name__ == "__main__":

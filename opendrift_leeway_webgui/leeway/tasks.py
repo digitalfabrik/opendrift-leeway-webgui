@@ -1,3 +1,4 @@
+import logging
 import subprocess
 from datetime import timedelta
 from pathlib import Path
@@ -8,6 +9,8 @@ from django.utils import timezone
 
 from .celery import app
 from .utils import send_result_mail
+
+logger = logging.getLogger(__name__)
 
 
 @app.task
@@ -48,8 +51,14 @@ def run_leeway_simulation(request_id):
         "--id",
         str(simulation.uuid),
     ]
-    with subprocess.Popen(params) as sim_proc:
-        sim_proc.communicate()
+    with subprocess.Popen(
+        params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
+    ) as sim_proc:
+        stdout, stderr = sim_proc.communicate()
+    logger.debug("Output from simulation %s: %s", simulation.uuid, stdout)
+    if stderr:
+        logger.error("Error during simulation %s: %s", simulation.uuid, stderr)
+        simulation.traceback = stderr.strip()
     simulation.simulation_finished = timezone.now()
     # Check if output files exist
     simulation_output = Path(settings.SIMULATION_OUTPUT)
