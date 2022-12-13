@@ -1,6 +1,6 @@
-import os
 import subprocess
 from datetime import timedelta
+from pathlib import Path
 
 from django.apps import apps
 from django.conf import settings
@@ -51,8 +51,16 @@ def run_leeway_simulation(request_id):
     with subprocess.Popen(params) as sim_proc:
         sim_proc.communicate()
     simulation.simulation_finished = timezone.now()
-    send_result_mail(simulation)
+    # Check if output files exist
+    simulation_output = Path(settings.SIMULATION_OUTPUT)
+    img_filename = f"{simulation.uuid}.png"
+    if (simulation_output / img_filename).is_file():
+        simulation.img.name = img_filename
+    netcdf_filename = f"{simulation.uuid}.nc"
+    if (simulation_output / netcdf_filename).is_file():
+        simulation.netcdf.name = netcdf_filename
     simulation.save()
+    send_result_mail(simulation)
 
 
 @app.task
@@ -64,7 +72,9 @@ def clean_simulations():
     for simulation in apps.get_model(
         app_label="leeway", model_name="LeewaySimulation"
     ).objects.filter(timezone.now() - timedelta(days=settings.SIMULATION_RETENTION)):
-        os.remove(os.path.join(settings.SIMULATION_OUTPUT, f"{simulation.uuid}.png"))
-        os.remove(os.path.join(settings.SIMULATION_OUTPUT, f"{simulation.uuid}.csv"))
         print(f"Removed simulation {simulation.uuid}.")
+        if simulation.img:
+            simulation.img.delete()
+        if simulation.netcdf:
+            simulation.netcdf.delete()
         simulation.delete()
