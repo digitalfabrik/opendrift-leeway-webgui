@@ -12,6 +12,7 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+from .logging_formatter import ColorFormatter, RequestFormatter
 from .utils import strtobool
 
 ###################
@@ -173,6 +174,82 @@ SIMULATION_OUTPUT = os.path.join(SIMULATION_ROOT, "output")
 
 #: Number of days for keeping simulations and results.
 SIMULATION_RETENTION = int(os.environ.get("LEEWAY_SIMULATION_RETENTION", 7))
+
+
+###########
+# LOGGING #
+###########
+
+#: The log level for opendrift-leeway-webgui django apps
+LOG_LEVEL = os.environ.get("LEEWAY_LOG_LEVEL", "DEBUG" if DEBUG else "INFO")
+
+#: The log level for the syslog
+SYS_LOG_LEVEL = "INFO"
+
+#: The log level for dependencies
+DEPS_LOG_LEVEL = os.environ.get("LEEWAY_DEPS_LOG_LEVEL", "INFO" if DEBUG else "WARN")
+
+#: The file path of the logfile. Needs to be writable by the application.
+LOGFILE = os.environ.get(
+    "LEEWAY_LOGFILE", os.path.join(BASE_DIR, "opendrift-leeway-webgui.log")
+)
+
+#: Logging configuration dictionary (see :setting:`django:LOGGING`)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {
+            "()": RequestFormatter,
+            "format": "{asctime} \x1b[1m{levelname}\x1b[0m {name} - {message}",
+            "datefmt": "%b %d %H:%M:%S",
+            "style": "{",
+        },
+        "console-colored": {
+            "()": ColorFormatter,
+            "format": "{asctime} {levelname} {name} - {message}",
+            "datefmt": "%b %d %H:%M:%S",
+            "style": "{",
+        },
+        "logfile": {
+            "()": RequestFormatter,
+            "format": "{asctime} {levelname:7} {name} - {message}",
+            "datefmt": "%b %d %H:%M:%S",
+            "style": "{",
+        },
+    },
+    "filters": {"require_debug_true": {"()": "django.utils.log.RequireDebugTrue"}},
+    "handlers": {
+        "console": {
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+        },
+        "console-colored": {
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "console-colored",
+        },
+        "logfile": {
+            "class": "logging.FileHandler",
+            "filename": LOGFILE,
+            "formatter": "logfile",
+        },
+    },
+    "loggers": {
+        # Loggers of opendrift-leeway-webgui django apps
+        "opendrift_leeway_webgui": {
+            "handlers": ["console-colored", "logfile"],
+            "level": LOG_LEVEL,
+        },
+        # Loggers of dependencies
+        "celery": {"handlers": ["console", "logfile"], "level": DEPS_LOG_LEVEL},
+        "django": {"handlers": ["console", "logfile"], "level": DEPS_LOG_LEVEL},
+        "dms2dec": {"handlers": ["console", "logfile"], "level": DEPS_LOG_LEVEL},
+        "redis": {"handlers": ["console", "logfile"], "level": DEPS_LOG_LEVEL},
+    },
+}
+
 
 ##########
 # CELERY #
