@@ -55,7 +55,7 @@ def clean_simulations():
     """
     Clean old simulations
     """
-    print("Cleaing old simulation data.")
+    print("Cleaning old simulation data.")
     for simulation in apps.get_model(
         app_label="leeway", model_name="LeewaySimulation"
     ).objects.filter(datetime.now() - timedelta(days=settings.SIMULATION_RETENTION)):
