@@ -6,7 +6,7 @@ After=syslog.target network.target
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/opt/opendrift-leeway-webgui
+WorkingDirectory=/opt/opendrift-leeway-webgui/opendrift_leeway_webgui
 ExecStart=/opt/opendrift-leeway-webgui/.venv/bin/celery -A leeway worker -l INFO -B --concurrency=%I
 Restart=on-abort
 
