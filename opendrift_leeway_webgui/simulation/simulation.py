@@ -16,95 +16,102 @@ from datetime import datetime, timedelta
 from opendrift.models.leeway import Leeway
 from opendrift.readers import reader_global_landmask
 
-PARSER = argparse.ArgumentParser(description="Simulate drift of object")
-PARSER.add_argument(
-    "--longitude", help="Start longitude of the drifting object", type=float
-)
-PARSER.add_argument(
-    "--latitude", help="Start latitude of the drifting object", type=float
-)
-PARSER.add_argument(
-    "--start-time",
-    help="Starting time (YYYY-MM-DD HH:MM) of the simulation. Default: Now",
-    default=datetime.now().strftime("%Y-%m-%d %H:%M"),
-)
-PARSER.add_argument(
-    "--duration",
-    help="Duration of the simulation in hours. Default: 12h.",
-    type=int,
-    default=12,
-)
-PARSER.add_argument(
-    "--object-type",
-    help=(
-        "Object type integer ID from https://github.com/OpenDrift/"
-        "opendrift/blob/master/opendrift/models/OBJECTPROP.DAT"
-    ),
-    type=int,
-    default=27,
-)
-PARSER.add_argument(
-    "--number", help="Number of drifters simulated.", type=int, default=100
-)
-PARSER.add_argument(
-    "--radius",
-    help=(
-        "Radius for distributing drifting particles around the start coordinates "
-        "in meters."
-    ),
-    type=int,
-    default=1000,
-)
-PARSER.add_argument(
-    "--id", help="ID used for result image name.", default=str(uuid.uuid4())
-)
-PARSER.add_argument(
-    "--no-web",
-    help="Disable fetching simulation data from web.",
-    action="store_true",
-    default=False,
-)
-ARGS = PARSER.parse_args()
-
-SIMULATION = Leeway(loglevel=50)
-
 INPUTDIR = "/code/leeway/input"
-SOURCES = [
-    os.path.join(INPUTDIR, data_file)
-    for data_file in os.listdir(INPUTDIR)
-    if data_file.endswith(".nc")
-]
 
-if not ARGS.no_web:
-    SOURCES.extend(
-        (
-            "https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest",
-            "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
+
+def main():
+    """Run opendrift leeway simulation"""
+    parser = argparse.ArgumentParser(description="Simulate drift of object")
+    parser.add_argument(
+        "--longitude", help="Start longitude of the drifting object", type=float
+    )
+    parser.add_argument(
+        "--latitude", help="Start latitude of the drifting object", type=float
+    )
+    parser.add_argument(
+        "--start-time",
+        help="Starting time (YYYY-MM-DD HH:MM) of the simulation. Default: Now",
+        default=datetime.now().strftime("%Y-%m-%d %H:%M"),
+    )
+    parser.add_argument(
+        "--duration",
+        help="Duration of the simulation in hours. Default: 12h.",
+        type=int,
+        default=12,
+    )
+    parser.add_argument(
+        "--object-type",
+        help=(
+            "Object type integer ID from https://github.com/OpenDrift/"
+            "opendrift/blob/master/opendrift/models/OBJECTPROP.DAT"
+        ),
+        type=int,
+        default=27,
+    )
+    parser.add_argument(
+        "--number", help="Number of drifters simulated.", type=int, default=100
+    )
+    parser.add_argument(
+        "--radius",
+        help=(
+            "Radius for distributing drifting particles around the start coordinates "
+            "in meters."
+        ),
+        type=int,
+        default=1000,
+    )
+    parser.add_argument(
+        "--id", help="ID used for result image name.", default=str(uuid.uuid4())
+    )
+    parser.add_argument(
+        "--no-web",
+        help="Disable fetching simulation data from web.",
+        action="store_true",
+        default=False,
+    )
+    args = parser.parse_args()
+
+    simulation = Leeway(loglevel=50)
+    sources = [
+        os.path.join(INPUTDIR, data_file)
+        for data_file in os.listdir(INPUTDIR)
+        if data_file.endswith(".nc")
+    ]
+
+    if not args.no_web:
+        sources.extend(
+            (
+                "https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest",
+                "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
+            )
         )
+
+    print("Using sources:\n - {}".format("\n - ".join(sources)))
+
+    simulation.add_readers_from_list(sources, lazy=True)
+
+    reader_landmask = reader_global_landmask.Reader()
+    simulation.add_reader([reader_landmask])
+
+    simulation.seed_elements(
+        lon=args.longitude,
+        lat=args.latitude,
+        time=datetime.strptime(args.start_time, "%Y-%m-%d %H:%M"),
+        number=args.number,
+        radius=args.radius,
+        object_type=args.object_type,
     )
 
-print("Using sources:\n - {}".format("\n - ".join(SOURCES)))
+    outfile = os.path.join("/code", "leeway", "output", args.id)
 
-SIMULATION.add_readers_from_list(SOURCES, lazy=True)
+    simulation.run(
+        duration=timedelta(hours=args.duration), time_step=600, outfile=f"{outfile}.nc"
+    )
+    simulation.plot(
+        fast=True, legend=True, filename=f"{outfile}.png", linecolor="age_seconds"
+    )
+    print(f"Success: {outfile}.png written.")
 
-READER_LANDMASK = reader_global_landmask.Reader()
-SIMULATION.add_reader([READER_LANDMASK])
 
-SIMULATION.seed_elements(
-    lon=ARGS.longitude,
-    lat=ARGS.latitude,
-    time=datetime.strptime(ARGS.start_time, "%Y-%m-%d %H:%M"),
-    number=ARGS.number,
-    radius=ARGS.radius,
-    object_type=ARGS.object_type,
-)
-
-OUTFILE = os.path.join("/code", "leeway", "output", ARGS.id)
-
-SIMULATION.run(
-    duration=timedelta(hours=ARGS.duration), time_step=600, outfile=f"{OUTFILE}.nc"
-)
-SIMULATION.plot(
-    fast=True, legend=True, filename=f"{OUTFILE}.png", linecolor="age_seconds"
-)
-print(f"{OUTFILE}.png written.")
+if __name__ == "__main__":
+    main()
