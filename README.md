@@ -1,3 +1,4 @@
+[![GitHub Workflow Status](https://github.com/digitalfabrik/opendrift-leeway-webgui/workflows/Tests/badge.svg)](https://github.com/digitalfabrik/opendrift-leeway-webgui/actions?query=workflow%3ATests)
 [![Pylint](https://img.shields.io/badge/pylint-10.00-brightgreen)](https://www.pylint.org/)
 [![PyPi](https://img.shields.io/pypi/v/opendrift-leeway-webgui.svg)](https://pypi.org/project/opendrift-leeway-webgui/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
