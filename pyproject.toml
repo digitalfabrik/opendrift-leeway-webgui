@@ -7,7 +7,7 @@ name = "opendrift-leeway-webgui"
 description = "Web GUI for Leeway simulations with OpenDrift"
 version = "2022.12.0"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 keywords = ["OpenDrift", "Leeway", "SAR", "Search", "Rescue", "Simulation", "Drift"]
 license = {text = "Apache2 2.0 License"}
 classifiers = [

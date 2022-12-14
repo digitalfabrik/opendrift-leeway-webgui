@@ -21,6 +21,8 @@ The program regularly fetches incoming mails via IMAP and starts simulations fro
 
 # Installation
 
+**Prerequisite:** _Python 3.8 or later is required._
+
 1. Clone this repository and change into the new directory:
    ```bash
    gh repo clone digitalfabrik/leeway
