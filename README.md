@@ -1,3 +1,4 @@
+[![GitHub Workflow Status](https://github.com/digitalfabrik/opendrift-leeway-webgui/workflows/Tests/badge.svg)](https://github.com/digitalfabrik/opendrift-leeway-webgui/actions?query=workflow%3ATests)
 [![Pylint](https://img.shields.io/badge/pylint-10.00-brightgreen)](https://www.pylint.org/)
 [![PyPi](https://img.shields.io/pypi/v/opendrift-leeway-webgui.svg)](https://pypi.org/project/opendrift-leeway-webgui/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -20,6 +21,8 @@ Django users have to be created in the CRUD backend, available at https://leeway
 The program regularly fetches incoming mails via IMAP and starts simulations from key-value-pairs in the mail subject or text body. The sender of the mail needs to have an associated account. Allowed keys via e-mail are: `longitude`, `latitude`, `object_type`, `radius`, `duration`, `start_time`. The separator between key and value is `=`. Key-value-pairs are separated by `;` in the subject and by new lines in the text body. The date format for start date is `YYYY-MM-DD HH:MM:SS`.
 
 # Installation
+
+**Prerequisite:** _Python 3.8 or later is required._
 
 1. Clone this repository and change into the new directory:
    ```bash

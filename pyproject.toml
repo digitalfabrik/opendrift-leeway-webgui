@@ -7,7 +7,7 @@ name = "opendrift-leeway-webgui"
 description = "Web GUI for Leeway simulations with OpenDrift"
 version = "2022.12.0"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 keywords = ["OpenDrift", "Leeway", "SAR", "Search", "Rescue", "Simulation", "Drift"]
 license = {text = "Apache2 2.0 License"}
 classifiers = [
@@ -35,6 +35,10 @@ dev = [
     "pre-commit",
     "pylint",
     "pylint-django",
+    "pytest",
+    "pytest-cov",
+    "pytest-django",
+    "pytest-env",
 ]
 
 [tool.setuptools.packages.find]
@@ -89,3 +93,18 @@ max-line-length = 120
 
 [tool.pylint.reports]
 output-format = "colorized"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--quiet",
+    "--cov=opendrift_leeway_webgui",
+    "--cov-report=html",
+    "--disable-warnings",
+]
+testpaths = [
+    "tests",
+]
+DJANGO_SETTINGS_MODULE = "opendrift_leeway_webgui.core.settings"
+env = [
+    "LEEWAY_SECRET_KEY=dummy"
+]
