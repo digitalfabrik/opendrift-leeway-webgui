@@ -110,7 +110,24 @@ def main():
     simulation.plot(
         fast=True, legend=True, filename=f"{outfile}.png", linecolor="age_seconds"
     )
+    simulation.plot(
+        fast=True, legend=True, filename=f"{outfile}.jpg", linecolor="age_seconds"
+    )
     print(f"Success: {outfile}.png written.")
+
+    simulation.animation(
+        background=["x_sea_water_velocity", "y_sea_water_velocity"],
+        bgalpha=0.7,
+        land_color="#666666",
+        fast=True,
+        filename=f"{outfile}-currents.mp4",
+    )
+    simulation.animation(
+        background=["x_wind", "y_wind"],
+        ocean_color="skyblue",
+        land_color="burlywood",
+        filename=f"{outfile}-wind.mp4",
+    )
 
 
 if __name__ == "__main__":
