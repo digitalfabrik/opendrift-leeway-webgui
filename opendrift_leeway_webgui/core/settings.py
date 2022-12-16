@@ -165,11 +165,11 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.environ.get("LEEWAY_STATIC_ROOT")
 
 #: URL where simulations are served
-SIMULATION_URL = "/simulations/"
+SIMULATION_URL = "/simulation-files/"
 
 #: The path where simulation results are stored
 SIMULATION_ROOT = os.environ.get(
-    "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR, "simulation")
+    "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR, "simulation-files")
 )
 
 #: The output path of simulation results
