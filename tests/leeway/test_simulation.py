@@ -17,7 +17,7 @@ def test_simulation(admin_client, settings, celery_app, celery_worker):
     # Send emails to console
     settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
     # Submit form
-    form = reverse("home")
+    form = reverse("simulation_form")
     response = admin_client.post(
         form,
         data={
@@ -29,7 +29,11 @@ def test_simulation(admin_client, settings, celery_app, celery_worker):
             "radius": 1000,
         },
     )
-    assert response.status_code == 200
+    # On success, the user is redirected to the form again
+    assert response.status_code == 302
+    assert response.headers.get("Location") == form
+    # Follow the redirect to receive the message
+    response = admin_client.get(form)
     assert (
         "Request saved. You will receive an e-mail to admin@example.com when the simulation is finished."
         in response.content.decode("utf-8")
@@ -42,8 +46,8 @@ def test_simulation(admin_client, settings, celery_app, celery_worker):
     assert match
     uuid = match[1]
     # Test list view
-    simulations_list = reverse("simulations_list")
-    response = admin_client.get(simulations_list)
+    simulation_list = reverse("simulation_list")
+    response = admin_client.get(simulation_list)
     assert response.status_code == 200
     assert f"<td>{uuid}</td>" in response.content.decode("utf-8")
     # Print the UUID to stdout to enable the teardown method to check the image

@@ -12,19 +12,15 @@ class LeewaySimulationForm(ModelForm):
     Add a form for simulations with some tweaks of the default.
     """
 
-    def __init__(self, *args, **kwargs):
-        """
-        Use CharField for latitude and longitude to allow DMS input
-        """
-        super().__init__(*args, **kwargs)
-        self.fields["longitude"] = CharField(
-            help_text="(E/W) Input in decimal and degrees minutes seconds supported.",
-            widget=TextInput(attrs={"placeholder": "12° 26' 42.684\""}),
-        )
-        self.fields["latitude"] = CharField(
-            help_text="(N/S) Input in decimal and degrees minutes seconds supported.",
-            widget=TextInput(attrs={"placeholder": "34° 47' 49.1166\""}),
-        )
+    # Override coordinates fields to allow text input instead of float numbers
+    longitude = CharField(
+        help_text="(E/W) Input in decimal and degrees minutes seconds supported.",
+        widget=TextInput(attrs={"placeholder": "12° 26' 42.684\""}),
+    )
+    latitude = CharField(
+        help_text="(N/S) Input in decimal and degrees minutes seconds supported.",
+        widget=TextInput(attrs={"placeholder": "34° 47' 49.1166\""}),
+    )
 
     class Meta:
         """
@@ -40,7 +36,6 @@ class LeewaySimulationForm(ModelForm):
             "duration",
             "radius",
         ]
-
         help_texts = {
             "duration": "Length of simulation in hours.",
             "radius": (

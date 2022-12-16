@@ -2,12 +2,32 @@
 table {
     border-spacing: 0 20px;
 }
+th {
+    text-align: left;
+}
 td {
     padding-left: 20px;
 }
+.errorlist {
+    font-weight: bold;
+    color: red;
+    list-style-type: none;
+    padding: 0;
+}
 
 /* Success/error messages */
-.error {
+.messages {
     font-weight: bold;
+}
+.success {
+    color: green;
+}
+.info {
+    color: blue;
+}
+.warning {
+    color: orange;
+}
+.error {
     color: red;
 }

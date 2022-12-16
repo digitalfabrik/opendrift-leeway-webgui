@@ -108,7 +108,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 #: The URL where requests are redirected after login (see :setting:`django:LOGIN_REDIRECT_URL`)
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "simulation_form"
+
+#: The URL where requests are redirected after logout (see :setting:`django:LOGOUT_REDIRECT_URL`)
+LOGOUT_REDIRECT_URL = "login"
 
 
 ############
