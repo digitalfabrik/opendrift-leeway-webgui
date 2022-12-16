@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load static %}
 <!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}
 <html lang="{{ LANGUAGE_CODE }}">
@@ -9,18 +10,7 @@
         <meta name="keywords"
               content="OpenDrift, Leeway, SAR, Search, Rescue, Simulation, Drift"/>
         <title>Leeway Simulation</title>
-        <style>
-            td {
-            padding-left: 20px;
-            }
-            table {
-            border-spacing: 0 20px;
-            }
-            .error {
-                font-weight: bold;
-                color: red;
-            }
-        </style>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
     </head>
     <body>
         <main>

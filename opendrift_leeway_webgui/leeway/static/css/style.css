@@ -1,0 +1,13 @@
+/* Form table */
+table {
+    border-spacing: 0 20px;
+}
+td {
+    padding-left: 20px;
+}
+
+/* Success/error messages */
+.error {
+    font-weight: bold;
+    color: red;
+}
