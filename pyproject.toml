@@ -44,6 +44,9 @@ dev = [
 [tool.setuptools.packages.find]
 include = ["opendrift_leeway_webgui*"]
 
+[tool.setuptools.package-data]
+opendrift_leeway_webgui = ["**/templates/**/*.html"]
+
 [tool.black]
     skip-magic-trailing-comma = true
 
