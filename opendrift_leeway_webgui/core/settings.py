@@ -60,6 +60,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "opendrift_leeway_webgui.leeway",
+    "rest_framework",
+    "drf_spectacular",
+    "knox",
 ]
 
 #: Activated middlewares (see :setting:`django:MIDDLEWARE`)
@@ -279,6 +282,36 @@ CELERY_BROKER_URL = "redis://localhost:6379/0"
 
 #: The backend used to store task results (tombstones). Disabled by default.
 CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+
+#############################
+# DJANGO REST API FRAMEWORK #
+#############################
+
+#: The configuration for django-rest-framework (drf)
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "knox.auth.TokenAuthentication",
+    ),
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "ALLOWED_VERSIONS": ("v1"),
+    "DEFAULT_VERSION": "default",
+}
+
+#: The configuration for the API documentation by drf-spectacular
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Opendrift Leeway Webgui API",
+    "DESCRIPTION": "The API documentation for the Opendrift Leeway Webgui",
+    "VERSION": None,
+    "SCHEMA_PATH_PREFIX": "/api(/v[0-9])?",
+    "CONTACT": {"email": "tech@integreat-app.de"},
+    "LICENSE": {
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    },
+}
 
 
 ##########

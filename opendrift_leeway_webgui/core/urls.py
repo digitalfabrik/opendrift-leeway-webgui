@@ -20,4 +20,5 @@ urlpatterns = [
     path("", include("opendrift_leeway_webgui.leeway.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
+    path("api/", include("opendrift_leeway_webgui.api.urls", namespace="api")),
 ]

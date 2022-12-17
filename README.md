@@ -20,6 +20,14 @@ Django users have to be created in the CRUD backend, available at https://leeway
 
 The program regularly fetches incoming mails via IMAP and starts simulations from key-value-pairs in the mail subject or text body. The sender of the mail needs to have an associated account. Allowed keys via e-mail are: `longitude`, `latitude`, `object_type`, `radius`, `duration`, `start_time`. The separator between key and value is `=`. Key-value-pairs are separated by `;` in the subject and by new lines in the text body. The date format for start date is `YYYY-MM-DD HH:MM:SS`.
 
+# API usage
+
+API documentation can be found at: https://leeway.tuerantuer.org/api/docs/
+
+Authentication can be provided in two ways:
+1. Via your session cookie, obtained from the normal login
+2. Via an authentication token, can be obtained via [/api/auth/login/](https://leeway.tuerantuer.org/api/v1/docs/#/auth/auth_login_create)
+
 # Installation
 
 **Prerequisite:** _Python 3.8 or later is required._
