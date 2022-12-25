@@ -1,5 +1,5 @@
-opendrift_leeway_webgui/simulation/output/*
-opendrift_leeway_webgui/simulation/input/*
+opendrift_leeway_webgui/simulation-files/output/*
+opendrift_leeway_webgui/simulation-files/input/*
 .netrc
 opendrift_leeway_webgui/celerybeat-schedule.db
 

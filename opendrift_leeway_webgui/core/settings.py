@@ -23,7 +23,7 @@ from .utils import strtobool
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #: The path to the simulation script passed to the opendrift docker container
-SIMULATION_SCRIPT_PATH = BASE_DIR / "simulation" / "simulation.py"
+SIMULATION_SCRIPT_PATH = BASE_DIR / "simulation.py"
 
 #: Number of drifters simulated
 OPENDRIFT_NUMBER_DRIFTERS = int(os.environ.get("LEEWAY_OPENDRIFT_NUMBER_DRIFTERS", 100))
@@ -111,7 +111,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 #: The URL where requests are redirected after login (see :setting:`django:LOGIN_REDIRECT_URL`)
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "simulation_form"
+
+#: The URL where requests are redirected after logout (see :setting:`django:LOGOUT_REDIRECT_URL`)
+LOGOUT_REDIRECT_URL = "login"
 
 
 ############
@@ -168,11 +171,11 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.environ.get("LEEWAY_STATIC_ROOT")
 
 #: URL where simulations are served
-SIMULATION_URL = "/simulations/"
+SIMULATION_URL = "/simulation-files/"
 
 #: The path where simulation results are stored
 SIMULATION_ROOT = os.environ.get(
-    "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR, "simulation")
+    "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR, "simulation-files")
 )
 
 #: The output path of simulation results

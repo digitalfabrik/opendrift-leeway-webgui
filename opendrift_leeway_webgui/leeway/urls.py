@@ -6,25 +6,30 @@ For more information on this file, see :doc:`django:topics/http/urls`.
 """
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib.auth.decorators import login_required
 from django.urls import include, path
-from django.views.generic.detail import DetailView
 
-from . import views
-from .models import LeewaySimulation
+from .views import (
+    IndexRedirectView,
+    LeewaySimulationCreateView,
+    LeewaySimulationDetailView,
+    LeewaySimulationListView,
+)
 
 #: The url patterns of this module (see :doc:`django:topics/http/urls`)
 urlpatterns = [
-    path("", views.simulation_form, name="home"),  # new
+    path("", IndexRedirectView.as_view(), name="index"),
     path(
-        "list/",
+        "simulations/",
         include(
             [
-                path("", views.simulations_list, name="simulations_list"),
+                path("", LeewaySimulationListView.as_view(), name="simulation_list"),
                 path(
-                    "<pk>",
-                    login_required(DetailView.as_view(model=LeewaySimulation)),
-                    name="simulation_error",
+                    "new/", LeewaySimulationCreateView.as_view(), name="simulation_form"
+                ),
+                path(
+                    "<pk>/",
+                    LeewaySimulationDetailView.as_view(),
+                    name="simulation_detail",
                 ),
             ]
         ),

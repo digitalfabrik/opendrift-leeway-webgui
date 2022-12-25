@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load static %}
 <!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}
 <html lang="{{ LANGUAGE_CODE }}">
@@ -9,34 +10,21 @@
         <meta name="keywords"
               content="OpenDrift, Leeway, SAR, Search, Rescue, Simulation, Drift"/>
         <title>Leeway Simulation</title>
-        <style>
-            td {
-            padding-left: 20px;
-            }
-            table {
-            border-spacing: 0 20px;
-            }
-            .error {
-                font-weight: bold;
-                color: red;
-            }
-        </style>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
     </head>
     <body>
         <main>
             {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
+                <div class="messages">
+                    {% for message in messages %}<p class="{{ message.level_tag }}">{{ message|linebreaksbr }}</p>{% endfor %}
+                </div>
             {% endif %}
             {% block content %}
             {% endblock content %}
             <p>
                 <a href="https://github.com/digitalfabrik/opendrift-leeway-webgui">Source Code</a>
                 {% if user.is_authenticated %}
-                    | <a href="{% url "simulations_list" %}">List of simulations</a> | <a href="{% url "home" %}">New Simulation</a> | <a href="{% url "logout" %}">Logout</a>
+                    | <a href="{% url "simulation_list" %}">List of simulations</a> | <a href="{% url "simulation_form" %}">New Simulation</a> | <a href="{% url "logout" %}">Logout</a>
                 {% endif %}
             </p>
         </main>
