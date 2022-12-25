@@ -42,7 +42,7 @@ class LeewaySimulationForm(ModelForm):
                 "Radius for distributing drifting particles around "
                 "the start coordinates in meters."
             ),
-            "start_time": "All times are UTC. Only simulations +/- 4 days from now are possible.",
+            "start_time": "All times are UTC. Only simulations +/- 5 days from now are possible.",
         }
 
     def clean_longitude(self):
