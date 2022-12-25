@@ -20,7 +20,10 @@ classifiers = [
 dependencies = [
     "celery",
     "django>=4.1",
+    "djangorestframework",
+    "django-rest-knox",
     "dms2dec",
+    "drf-spectacular",
     "redis",
 ]
 
