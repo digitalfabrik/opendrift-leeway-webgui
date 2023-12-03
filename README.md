@@ -37,10 +37,10 @@ Authentication can be provided in two ways:
    gh repo clone digitalfabrik/leeway
    cd leeway
    ```
-2. Create a virtual environment and activate it:
+2. Create a virtual environment outside of the project directory and activate it:
    ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
+   python3 -m venv ~/.venv
+   source ~/.venv/bin/activate
    ```
 3. Install the dependencies:
    ```bash
