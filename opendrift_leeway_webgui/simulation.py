@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 from opendrift.models.leeway import Leeway
 from opendrift.readers import reader_global_landmask
 from sklearn.cluster import KMeans
-import pandas as pd
+import pyproj
 
 INPUTDIR = "/code/leeway/input"
 
@@ -130,14 +130,32 @@ def plot_k_means(coordinates, max_distance=3000):
     max_dinstance indicates the maximum distance of each particle from the
     center of each cluster.
     """
+    cartesian_coordinates = map(geodetic_to_cartesian, coordinates)
     distance = 9999
     k = 0
     while distance > max_distance:
         k = k + 1
-        kmeans = KMeans(n_clusters=k).fit(coordinates)
+        kmeans = KMeans(n_clusters=k).fit(cartesian_coordinates)
         coordinates_dist = kmeans.transform(coordinates)**2
-        df = pd.DataFrame(coordinates_dist.sum(axis=1).round(2), columns=['sqdist'])
-        print(df.head())
+        print(coordinates_dist)
+
+def cartesian_to_geodetic(x, y, z):
+    """
+    Convert cartesian coordinates to latitiude & longitude
+    """
+    ecef = pyproj.Proj(proj='geocent', ellps='WGS84', datum='WGS84')
+    lla = pyproj.Proj(proj='latlong', ellps='WGS84', datum='WGS84')
+    lon, lat, alt = pyproj.transform(ecef, lla, x, y, z, radians=False)
+    return lat, lon, alt
+
+def geodetic_to_cartesian(lat, lon, alt = 0):
+    """
+    Convert latitiude & longitude to cartesian coordinates
+    """
+    ecef = pyproj.Proj(proj='geocent', ellps='WGS84', datum='WGS84')
+    lla = pyproj.Proj(proj='latlong', ellps='WGS84', datum='WGS84')
+    x, y, z = pyproj.transform(lla, ecef, lon, lat, alt, radians=False)
+    return x, y, z
 
 if __name__ == "__main__":
     main()
