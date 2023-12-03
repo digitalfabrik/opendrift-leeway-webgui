@@ -148,10 +148,13 @@ def cartesian_to_geodetic(x, y, z):
     lon, lat, alt = pyproj.transform(ecef, lla, x, y, z, radians=False)
     return lat, lon, alt
 
-def geodetic_to_cartesian(lat, lon, alt = 0):
+def geodetic_to_cartesian(lonlat):
     """
     Convert latitiude & longitude to cartesian coordinates
     """
+    lon = lonlat[0]
+    lat = lonlat[1]
+    alt = 0
     ecef = pyproj.Proj(proj='geocent', ellps='WGS84', datum='WGS84')
     lla = pyproj.Proj(proj='latlong', ellps='WGS84', datum='WGS84')
     x, y, z = pyproj.transform(lla, ecef, lon, lat, alt, radians=False)
