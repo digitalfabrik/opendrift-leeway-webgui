@@ -35,6 +35,10 @@ class LeewaySimulationForm(ModelForm):
             "start_time",
             "duration",
             "radius",
+            "send_trajectories",
+            "send_heatmap",
+            "send_animation_wind",
+            "send_animation_sea",
         ]
         help_texts = {
             "duration": "Length of simulation in hours.",

@@ -107,9 +107,18 @@ def main():
     simulation.run(
         duration=timedelta(hours=args.duration), time_step=600, outfile=f"{outfile}.nc"
     )
+
+
     simulation.plot(
         fast=True, legend=True, filename=f"{outfile}.png", linecolor="age_seconds"
     )
+
+    simulation.plot(
+        background=simulation.get_density_array(pixelsize_m=3000),
+        clabel='Probability of origin [%]', fast=True, markersize=.5, lalpha=.02,
+        outfile=f"{outfile}-density.png"
+    )
+
     print(f"Success: {outfile}.png written.")
 
 

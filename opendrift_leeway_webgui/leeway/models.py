@@ -35,6 +35,18 @@ class LeewaySimulation(models.Model):
     simulation_started = models.DateTimeField(null=True)
     simulation_finished = models.DateTimeField(null=True)
     radius = models.IntegerField(default=1000)
+    send_trajectories = models.BooleanField(
+        default=True,
+        help_text="Attach PNG to e-mail with particle trajectories.")
+    send_heatmap = models.BooleanField(
+        default=False,
+        help_text="Attach PNG to e-mail with heat map of final particle locations.")
+    send_animation_wind = models.BooleanField(
+        default=False,
+        help_text="Attach Gif to e-mail with animation of particles and wind fields.")
+    send_animation_sea = models.BooleanField(
+        default=False,
+        help_text="Attach Gif to e-mail with animation of particles with sea currents.")
     img = models.FileField(
         null=True, storage=simulation_storage, verbose_name=_("Image file")
     )
