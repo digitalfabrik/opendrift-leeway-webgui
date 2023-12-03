@@ -34,7 +34,7 @@ Authentication can be provided in two ways:
 
 1. Clone this repository and change into the new directory:
    ```bash
-   gh repo clone digitalfabrik/leeway
+   git clone git@github.com:digitalfabrik/opendrift-leeway-webgui.git leeway
    cd leeway
    ```
 2. Create a virtual environment outside of the project directory and activate it:

@@ -12,12 +12,18 @@ from .views import (
     IndexRedirectView,
     LeewaySimulationCreateView,
     LeewaySimulationDetailView,
+    LeewaySimulationDocumentation,
     LeewaySimulationListView,
 )
 
 #: The url patterns of this module (see :doc:`django:topics/http/urls`)
 urlpatterns = [
     path("", IndexRedirectView.as_view(), name="index"),
+    path(
+        "documentation/",
+        LeewaySimulationDocumentation.as_view(),
+        name="simulation_documentation",
+    ),
     path(
         "simulations/",
         include(
