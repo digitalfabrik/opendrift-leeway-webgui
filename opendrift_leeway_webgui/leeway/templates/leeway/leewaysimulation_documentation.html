@@ -2,25 +2,41 @@
 {% block content %}
     <h2>Leeway Simulation Documentation</h2>
     <h3>Background</h3>
-    <p>This software acts as a web user interface for the <a href="https://opendrift.github.io/gallery/example_leeway.html">OpenDrift Leeway</a> model. The basis for the simulation are experiments performed by the US Coast Guard in 1999. The results are published on <a href="https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/ADA366414.xhtml">https://ntrl.ntis.gov</a>, which include desriptions of the objects that were tested (2-13 and following pages).</p>
+    <p>
+        This software acts as a web user interface for the <a href="https://opendrift.github.io/gallery/example_leeway.html">OpenDrift Leeway</a> model. The basis for the simulation are experiments performed by the US Coast Guard in 1999. The results are published on <a href="https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/ADA366414.xhtml">https://ntrl.ntis.gov</a>, which include desriptions of the objects that were tested (2-13 and following pages).
+    </p>
     <h3>E-Mail Interface</h3>
-    <p>If you have a low bandwidth connection, you can use the e-mail interface. The simulation parameters can be set in the e-mail subject. Your e-mail address needs to be registered for you user account in this tool first. The result of the simulation will be sent to your e-mail address within a couple of minutes.</p>
+    <p>
+        If you have a low bandwidth connection, you can use the e-mail interface. The simulation parameters can be set in the e-mail subject. Your e-mail address needs to be registered for you user account in this tool first. The result of the simulation will be sent to your e-mail address within a couple of minutes.
+    </p>
     <ol>
-      <li>Create a new e-mail</li>
-      <li>Enter simulation parameters with adjusted values in the subject: <pre>latitude=33.333;longitude=14.444;duration=48;start_time=2022-12-10 00:00:00;object_type=27</pre></li>
-      <li>Send the mail to <pre>{{ SERVER_EMAIL }}</pre></li>
+        <li>Create a new e-mail</li>
+        <li>
+            Enter simulation parameters with adjusted values in the subject: <pre>latitude=33.333;longitude=14.444;duration=48;start_time=2022-12-10 00:00:00;object_type=27</pre>
+        </li>
+        <li>
+            Send the mail to <pre>{{ SERVER_EMAIL }}</pre>
+        </li>
     </ol>
     The default object type for simulatoins is a life raft (ID: 27). Some alternatives are:
     <ul>
-      <li>Person in Water (unknown state): 1</li>
-      <li>Person in Water (conscious): 2</li>
-      <li>Person in water (deceased): 6</li>
-      <li>Life raft: 27</li>
-      <li>Skif, V-hull: 45</li>
+        <li>Person in Water (unknown state): 1</li>
+        <li>Person in Water (conscious): 2</li>
+        <li>Person in water (deceased): 6</li>
+        <li>Life raft: 27</li>
+        <li>Skif, V-hull: 45</li>
     </ul>
     <h3>Interpreting Simulation Result</h3>
-    <p>When the simulation is finished, you will receive an e-mail that contains an attached image with the simulation results.</p>
-    <p>The simulation will randomly distribute 100 test particles around your entered coordinates. The default radius for distributing the particles is 1000 meters. If the coordinates are not very clear, you can increase this radius.</p>
-    <p>The starting points of the simulated particles are marked with green dots. If the particle ends up floating in water at the end of the simulation, the particle is marked blue. If the particle ends up on shore, it is marked green.</p>
-    <p>The image shows the trajectories of particles from the starting points to the ending points. The color of the trajectories incdicates the position of a particle at a given time. For example the color green always shows the position of the particles after ~50% of the simulated time range, while orange shows the positions at ~75%.</p>
+    <p>
+        When the simulation is finished, you will receive an e-mail that contains an attached image with the simulation results.
+    </p>
+    <p>
+        The simulation will randomly distribute 100 test particles around your entered coordinates. The default radius for distributing the particles is 1000 meters. If the coordinates are not very clear, you can increase this radius.
+    </p>
+    <p>
+        The starting points of the simulated particles are marked with green dots. If the particle ends up floating in water at the end of the simulation, the particle is marked blue. If the particle ends up on shore, it is marked green.
+    </p>
+    <p>
+        The image shows the trajectories of particles from the starting points to the ending points. The color of the trajectories incdicates the position of a particle at a given time. For example the color green always shows the position of the particles after ~50% of the simulated time range, while orange shows the positions at ~75%.
+    </p>
 {% endblock content %}
