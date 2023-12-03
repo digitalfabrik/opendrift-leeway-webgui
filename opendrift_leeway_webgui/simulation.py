@@ -3,8 +3,11 @@ Wrapper/Helper script for Leeway simulations with OpenDrift.
 
 Use it with the docker container by mounting a directory and copying the file to it:
 
-docker run -it --volume ./simulation:/code/leeway opendrift/opendrift python3 leeway/simulation.py\
-    --longitude 11.9545 --latitude 35.2966 --start-time "2022-12-05 03:00" --duration 12
+docker run -it --volume /opt/leeway/opendrift_leeway_webgui/simulation-files:/code/leeway\
+    --volume /opt/leeway/opendrift_leeway_webgui/simulation.py:/code/leeway/simulation.py\
+    opendrift/opendrift python3 leeway/simulation.py --longitude 12.0 --latitude 34.0 --radius 1000\
+    --number 100 --start-time "2023-12-03 15:14" --object-type 27 --duration 12\
+    --id b22cc8d6-1235-4cfa-9c8f-2ebca101e4fb
 """
 
 import argparse
@@ -15,6 +18,8 @@ from datetime import datetime, timedelta
 # pylint: disable=import-error
 from opendrift.models.leeway import Leeway
 from opendrift.readers import reader_global_landmask
+from sklearn.cluster import KMeans
+import pandas as pd
 
 INPUTDIR = "/code/leeway/input"
 
@@ -113,14 +118,26 @@ def main():
         fast=True, legend=True, filename=f"{outfile}.png", linecolor="age_seconds"
     )
 
-    simulation.plot(
-        background=simulation.get_density_array(pixelsize_m=3000),
-        clabel='Probability of origin [%]', fast=True, markersize=.5, lalpha=.02,
-        outfile=f"{outfile}-density.png"
-    )
-
     print(f"Success: {outfile}.png written.")
 
+    lon, lat = simulation.get_lonlats()
+    coordinates = list(zip(lon[:, -1], lat[:, -1]))
+    plot_k_means(coordinates)
+
+def plot_k_means(coordinates, max_distance=3000):
+    """
+    Calculate k-means of final distribution of particles.
+    max_dinstance indicates the maximum distance of each particle from the
+    center of each cluster.
+    """
+    distance = 9999
+    k = 0
+    while distance > max_distance:
+        k = k + 1
+        kmeans = KMeans(n_clusters=k).fit(coordinates)
+        coordinates_dist = kmeans.transform(coordinates)**2
+        df = pd.DataFrame(coordinates_dist.sum(axis=1).round(2), columns=['sqdist'])
+        print(df.head())
 
 if __name__ == "__main__":
     main()

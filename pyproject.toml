@@ -25,6 +25,7 @@ dependencies = [
     "dms2dec",
     "drf-spectacular",
     "redis",
+    "sklearn",
 ]
 
 [project.urls]
