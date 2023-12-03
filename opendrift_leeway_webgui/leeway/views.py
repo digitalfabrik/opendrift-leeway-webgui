@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
@@ -19,6 +20,19 @@ class IndexRedirectView(RedirectView):
 
     #: The name of the URL pattern to redirect to
     pattern_name = settings.LOGIN_REDIRECT_URL
+
+
+class LeewaySimulationDocumentation(TemplateView):
+    """
+    Display end user documentation for using the tool
+    """
+
+    template_name = "leeway/leewaysimulation_documentation.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(LeewaySimulationDocumentation, self).get_context_data(**kwargs)
+        context["SERVER_EMAIL"] = settings.SERVER_EMAIL
+        return context
 
 
 class LeewaySimulationCreateView(LoginRequiredMixin, CreateView):
