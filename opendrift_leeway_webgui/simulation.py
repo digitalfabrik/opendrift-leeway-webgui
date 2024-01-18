@@ -130,13 +130,13 @@ def plot_k_means(coordinates, max_distance=3000):
     max_dinstance indicates the maximum distance of each particle from the
     center of each cluster.
     """
-    cartesian_coordinates = map(geodetic_to_cartesian, coordinates)
+    cartesian_coordinates = list(map(geodetic_to_cartesian, coordinates))
     distance = 9999
     k = 0
     while distance > max_distance:
         k = k + 1
         kmeans = KMeans(n_clusters=k).fit(cartesian_coordinates)
-        coordinates_dist = kmeans.transform(coordinates)**2
+        coordinates_dist = kmeans.transform(cartesian_coordinates)**2
         print(coordinates_dist)
 
 def cartesian_to_geodetic(x, y, z):
