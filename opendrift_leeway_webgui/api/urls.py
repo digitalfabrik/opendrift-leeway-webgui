@@ -1,6 +1,7 @@
 """
 URL patterns for the Opendrift Leeway Webgui API
 """
+
 from django.urls import include, path
 
 #: The namespace for this URL config (see :attr:`django.urls.ResolverMatch.app_name`)

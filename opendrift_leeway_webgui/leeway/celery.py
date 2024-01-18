@@ -1,6 +1,7 @@
 """
 Configure Celery workers
 """
+
 import configparser
 import email
 import os

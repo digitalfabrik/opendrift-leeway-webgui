@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-python@v4
       - uses: jamescurtin/isort-action@master
         with:
-          configuration: --check-only
+          configuration: --check-only -n
   pylint:
     runs-on: ubuntu-latest
     steps:
