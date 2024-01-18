@@ -57,6 +57,11 @@ Authentication can be provided in two ways:
    python3 manage.py migrate
    python3 manage.py createsuperuser
    ```
+6. Build the enhanced Docker container:
+   ```bash
+   cd opendrift
+   docker build -t opendrift-leeway-custom .
+   ```
 
 # Development Server
 

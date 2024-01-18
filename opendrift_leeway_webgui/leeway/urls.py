@@ -4,6 +4,7 @@ See :mod:`~opendrift_leeway_webgui.core.urls` for the other namespaces of this p
 
 For more information on this file, see :doc:`django:topics/http/urls`.
 """
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path

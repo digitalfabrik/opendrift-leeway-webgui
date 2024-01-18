@@ -1,6 +1,7 @@
 """
 Forms for the web GUI
 """
+
 from django.forms import CharField, ModelForm, TextInput
 
 from .models import LeewaySimulation

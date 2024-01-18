@@ -1,6 +1,7 @@
 """
 URL patterns for the first version of the Opendrift Leeway Webgui API
 """
+
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter

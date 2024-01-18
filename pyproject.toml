@@ -36,6 +36,8 @@ dependencies = [
 dev = [
     "bumpver",
     "pre-commit",
+    "numpy",
+    "matplotlib",
     "pylint",
     "pylint-django",
     "pytest",

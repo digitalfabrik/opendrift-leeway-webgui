@@ -1,6 +1,7 @@
 """
 This module contains shared fixtures for pytest
 """
+
 import pytest
 
 from .leeway.test_simulation import _teardown_test_simulation
