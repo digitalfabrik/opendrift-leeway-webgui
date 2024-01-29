@@ -154,16 +154,13 @@ def send_result_mail(simulation):
     """
     Create mail parts for result mail
     """
-    # Initialize mail
     email = EmailMessage(
         subject="Leeway Drift Simulation Result",
         body=mail_result_text(simulation),
         to=[simulation.user.email],
     )
-    # Attach result image
     if simulation.img:
         email.attach_file(simulation.img.path)
-    # Send email
     return email.send()
 
 
