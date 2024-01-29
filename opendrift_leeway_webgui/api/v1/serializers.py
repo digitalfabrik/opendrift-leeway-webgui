@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from ...leeway.models import LeewaySimulation
+from ...leeway.tasks import run_leeway_simulation
 
 
 class LeewaySimulationSerializer(serializers.ModelSerializer):
@@ -33,3 +34,8 @@ class LeewaySimulationSerializer(serializers.ModelSerializer):
             "simulation_started",
             "simulation_finished",
         ]
+
+    def create(self, validated_data):
+        simulation = LeewaySimulation.objects.create(**validated_data)
+        run_leeway_simulation.apply_async([simulation.uuid])
+        return simulation
