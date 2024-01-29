@@ -25,6 +25,7 @@
                     {% endif %}
                     {% if simulation.img %}<a href="{{ simulation.img.url }}">Image</a>{% endif %}
                     {% if simulation.netcdf %}<a href="{{ simulation.netcdf.url }}">NetCDF</a>{% endif %}
+                    <a href="{% url "simulation_delete" pk=simulation.pk %}">Delete</a>
                 </td>
             </tr>
         {% endfor %}

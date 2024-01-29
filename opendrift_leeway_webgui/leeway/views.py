@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.list import ListView
 
 from .forms import LeewaySimulationForm
@@ -102,3 +103,18 @@ class LeewaySimulationDetailView(LoginRequiredMixin, DetailView):
 
     #: The model for this detail view
     model = LeewaySimulation
+
+
+class LeewaySimulationDeleteView(LoginRequiredMixin, DeleteView):
+    """
+    View for rendering the simulation details
+    """
+
+    model = LeewaySimulation
+    success_url = reverse_lazy("simulation_list")
+
+    def get(self, request, *args, **kwargs):
+        if self.get_object().user == request.user:
+            self.object.delete()
+            return HttpResponseRedirect("/simulations")
+        return HttpResponseForbidden("Cannot delete other's simulations")
