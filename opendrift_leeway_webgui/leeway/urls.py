@@ -12,6 +12,7 @@ from django.urls import include, path
 from .views import (
     IndexRedirectView,
     LeewaySimulationCreateView,
+    LeewaySimulationDeleteView,
     LeewaySimulationDetailView,
     LeewaySimulationDocumentation,
     LeewaySimulationListView,
@@ -37,6 +38,11 @@ urlpatterns = [
                     "<pk>/",
                     LeewaySimulationDetailView.as_view(),
                     name="simulation_detail",
+                ),
+                path(
+                    "<pk>/delete/",
+                    LeewaySimulationDeleteView.as_view(),
+                    name="simulation_delete",
                 ),
             ]
         ),
