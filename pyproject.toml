@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "opendrift-leeway-webgui"
 description = "Web GUI for Leeway simulations with OpenDrift"
-version = "2022.12.0"
+version = "2024.1.0"
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["OpenDrift", "Leeway", "SAR", "Search", "Rescue", "Simulation", "Drift"]
@@ -59,7 +59,7 @@ opendrift_leeway_webgui = [
     skip-magic-trailing-comma = true
 
 [tool.bumpver]
-current_version = "2022.12.0"
+current_version = "2024.1.0"
 version_pattern = "YYYY.MM.INC0[-TAG]"
 commit_message = "Bump version to {new_version}"
 commit = true
