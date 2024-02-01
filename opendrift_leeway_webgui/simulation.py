@@ -138,16 +138,9 @@ def main():
     # (2021), Datenquellen:
     # https://gdz.bkg.bund.de/index.php/default/wms-topplusopen-wms-topplus-open.html
 
-    stranded = None
-    active = None
+    stranded=[[],[]]
+    active=[[],[]]
     for i in range(lon.shape[0]):
-        lon_max_idx = (
-            np.where(np.isnan(lon[i, ...]))[0][0] - 1 if np.isnan(lon[i, -1]) else -1
-        )
-        lat_max_idx = (
-            np.where(np.isnan(lat[i, ...]))[0][0] - 1 if np.isnan(lat[i, -1]) else -1
-        )
-
         points = np.array([lon[i, ...], lat[i, ...]]).T.reshape(-1, 1, 2)
         segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
@@ -158,46 +151,45 @@ def main():
         lc.set_linewidth(2)
         line = ax.add_collection(lc)
 
-        initial = ax.scatter(
-            lon[i, 0],
-            lat[i, 0],
-            transform=gcrs,
-            color="green",
-            zorder=100 + i,
-            s=15,
-            edgecolor="black",
-            linewidth=0.5,
-        )
-        if lon_max_idx > 0:
-            stranded = ax.scatter(
-                lon[i, lon_max_idx],
-                lat[i, lat_max_idx],
-                transform=gcrs,
-                color="red",
-                zorder=100 + i + 1,
-                s=15,
-                edgecolor="black",
-                linewidth=0.5,
-            )
+        nan_filter=np.isnan(lon[i])
+        if any(nan_filter):
+            stranded[0].append(lon[i,~nan_filter][-1])
+            stranded[1].append(lat[i,~nan_filter][-1])
         else:
-            active = ax.scatter(
-                lon[i, lon_max_idx],
-                lat[i, lat_max_idx],
-                transform=gcrs,
-                color="blue",
-                zorder=100 + i + 1,
-                s=15,
-                edgecolor="black",
-                linewidth=0.5,
-            )
+            active[0].append(lon[i][-1])
+            active[1].append(lat[i][-1])
+
+    initial=ax.scatter(lon[...,0],
+                       lat[...,0],
+                       transform=gcrs,
+                       color='green',
+                       zorder=args.number,
+                       s=15,
+                       edgecolor='black',
+                       linewidth=0.5)
+    initial.set_label('Initial')
+
+    if len(stranded[0])>0:
+        stranded=ax.scatter(*stranded,
+                            transform=gcrs,
+                            color='red',
+                            zorder=args.number+1,
+                            s=15,
+                            edgecolor='black',
+                            linewidth=0.5)
+        stranded.set_label('Stranded')
+
+    if len(active[0])>0:
+        active=ax.scatter(*active,
+                          transform=gcrs,
+                          color='blue',
+                          zorder=args.number+2,
+                          s=30,
+                          edgecolor='black',
+                          linewidth=0.5)
+        active.set_label('Active')
 
     # print legend for points
-    initial.set_label("Initial")
-    if stranded is not None:
-        stranded.set_label("Stranded")
-    if active is not None:
-        active.set_label("Active")
-
     ax.legend(loc="center right", bbox_to_anchor=(0, 0.5))
 
     # add colorbar with hours
@@ -297,12 +289,13 @@ def main():
         f"Leeway Simulation Object Type: {simulation.get_config('seed:object_type')}\n"
         f" From {start.strftime('%d-%m-%Y %H:%M')} to {end.strftime('%d-%m-%Y %H:%M')} UTC"
     )
-    fig.text(
-        0,
-        0,
-        "Kartendarstellung: © Bundesamt für Kartographie und Geodäsie (2021),\nDatenquellen:"
-        " https://gdz.bkg.bund.de/index.php/default/wms-topplusopen-wms-topplus-open.html",
-        fontsize=8,
+    fig.text(0,
+         0,
+        "by Space Eye and Tür an Tür\n"
+        "Simulation: Opendrift\n"
+        "Hintergrund Kartendarstellung: © Bundesamt für Kartographie und Geodäsie (2021),\n"
+        "Datenquellen: https://gdz.bkg.bund.de/index.php/default/wms-topplusopen-wms-topplus-open.html",
+        fontsize=8
     )
 
     fig.savefig(f"{outfile}.png")
