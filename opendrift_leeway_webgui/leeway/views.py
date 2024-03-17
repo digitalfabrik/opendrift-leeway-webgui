@@ -115,6 +115,6 @@ class LeewaySimulationDeleteView(LoginRequiredMixin, DeleteView):
 
     def get(self, request, *args, **kwargs):
         if self.get_object().user == request.user:
-            self.object.delete()
+            self.get_object().delete()
             return HttpResponseRedirect("/simulations")
         return HttpResponseForbidden("Cannot delete other's simulations")
