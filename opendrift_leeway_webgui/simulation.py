@@ -294,8 +294,8 @@ def main():
     end = start + timedelta(hours=args.duration)
 
     plt.title(
-        f"Leeway Simulation Object Type: {simulation.get_config('seed:object_type')}\n"
-        f" From {start.strftime('%d-%m-%Y %H:%M')} to {end.strftime('%d-%m-%Y %H:%M')} UTC"
+        f"Leeway Simulation Object Type: {simulation.leewayprop[args.object_type]['OBJKEY']}\n"
+        f" From {start.strftime('%Y-%m-%d %H:%M')} to {end.strftime('%d-%m-%Y %H:%M')} UTC"
     )
     fig.text(
         0,
