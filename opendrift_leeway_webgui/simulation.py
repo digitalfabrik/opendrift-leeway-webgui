@@ -295,7 +295,7 @@ def main():
 
     plt.title(
         f"Leeway Simulation Object Type: {simulation.leewayprop[args.object_type]['OBJKEY']}\n"
-        f" From {start.strftime('%Y-%m-%d %H:%M')} to {end.strftime('%d-%m-%Y %H:%M')} UTC"
+        f" From {start.strftime('%Y-%m-%d %H:%M')} to {end.strftime('%Y-%m-%d %H:%M')} UTC"
     )
     fig.text(
         0,
