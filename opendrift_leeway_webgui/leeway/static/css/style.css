@@ -1,12 +1,12 @@
 /* Form table */
 table {
-    border-spacing: 0 20px;
+    border-spacing: 5 10px;
 }
 th {
-    text-align: left;
+    text-align: center;
 }
 td {
-    padding-left: 20px;
+    text-align: center;
 }
 .errorlist {
     font-weight: bold;
