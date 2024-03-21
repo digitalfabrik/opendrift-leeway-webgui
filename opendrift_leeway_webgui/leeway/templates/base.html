@@ -24,7 +24,7 @@
             <p>
                 <a href="https://github.com/digitalfabrik/opendrift-leeway-webgui">Source Code</a>
                 {% if user.is_authenticated %}
-                    | <a href="{% url "simulation_documentation" %}">Documentation</a> | <a href="{% url "simulation_list" %}">List of simulations</a> | <a href="{% url "simulation_form" %}">New Simulation</a> 
+                    | <a href="{% url "simulation_documentation" %}">Documentation</a> | <a href="{% url "simulation_list" %}">List of simulations</a> | <a href="{% url "simulation_form" %}">New Simulation</a>
                 {% endif %}
             </p>
             {% if user.is_authenticated %}
