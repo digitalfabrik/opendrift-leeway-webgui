@@ -19,12 +19,14 @@ classifiers = [
 ]
 dependencies = [
     "celery",
+    "django-celery-beat",
     "django>=4.1",
     "djangorestframework",
     "django-rest-knox",
     "dms2dec",
     "drf-spectacular",
     "redis",
+    "requests",
 ]
 
 [project.urls]

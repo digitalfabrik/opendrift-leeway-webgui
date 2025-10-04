@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Setup.py """
+"""Setup.py"""
 from setuptools import setup
 
 setup()
