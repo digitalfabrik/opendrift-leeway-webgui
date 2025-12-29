@@ -88,7 +88,7 @@ def main():
     sources = [
         os.path.join(INPUTDIR, data_file)
         for data_file in os.listdir(INPUTDIR)
-        if data_file.endswith(".nc")
+        if data_file.endswith(".ncd")
     ]
 
     if not args.no_web:

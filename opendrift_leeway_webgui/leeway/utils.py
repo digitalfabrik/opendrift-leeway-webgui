@@ -2,10 +2,18 @@
 Utilities
 """
 
+import logging
+import os
+import subprocess
+
+import requests
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage, send_mail
 from dms2dec.dms_convert import dms2dec
+
+logger = logging.getLogger(__name__)
 
 # https://github.com/OpenDrift/opendrift/blob/master/opendrift/models/OBJECTPROP.DAT
 LEEWAY_OBJECT_TYPES = (
@@ -235,3 +243,64 @@ def normalize_dms2dec(data):
     if "°" in data:
         return dms2dec(data)
     return data
+
+
+def create_opengribs_bounding_box(longitude, latitude):
+    """
+    Calculate Bounding Box for GRIBS file download.
+    """
+    return {
+        "long_min": longitude - 1,
+        "long_max": longitude + 1,
+        "lat_min": latitude - 1,
+        "lat_max": latitude + 1,
+    }
+
+
+def request_opengribs_file(bounding_box):
+    """
+    Request GRIBS file on opengribs.org
+    """
+    request = requests.get(
+        url=(
+            f"http://grbsrv.opengribs.org/getmygribs2.php?osys=Unknown&ver=1.2.6&model=icon_p25_&"
+            f"la1={bounding_box['lat_min']}&la2={bounding_box['lat_max']}&"
+            f"lo1={bounding_box['long_min']}&lo2={bounding_box['long_max']}&"
+            f"intv=3&days=8&cyc=last&par=W;&wmdl=none&wpar=h;d;p;"
+        ),
+        timeout=30,
+    )
+    return request.json()["message"]["url"]
+
+
+def gribs2_to_netcdf(filename):
+    """
+
+    """
+    netcdf_filename = filename.replace(".grb2", ".ncd")
+    subprocess.run(["cdo", "copy", filename, netcdf_filename]) 
+    return netcdf_filename
+
+def get_opengribs_file(url):
+    """
+    Get OpenGRIBS file and save to disk.
+    """
+    response = requests.get(url, stream=True, timeout=30)
+    if response.status_code != 200:
+        return None
+    os.makedirs(os.path.join(settings.SIMULATION_ROOT, "input"), exist_ok=True)
+    filename = os.path.join(settings.SIMULATION_ROOT, "input", url.split("/")[-1])
+    with open(filename, "wb") as f:
+        for chunk in response.iter_content(chunk_size=1024):
+            f.write(chunk)
+    return gribs2_to_netcdf(filename)
+
+
+def get_opengribs_data(longitude, latitude):
+    """
+    Get data from OpenGRIBS
+    """
+    bbox = create_opengribs_bounding_box(longitude, latitude)
+    download_url = request_opengribs_file(bbox)
+    logger.info(f"Got GRIBS file {download_url} for {bbox}")
+    return get_opengribs_file(download_url)

@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from .celery import app
-from .utils import send_result_mail
+from .utils import get_opengribs_data, send_result_mail
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,7 @@ def run_leeway_simulation(request_id):
     simulation = LeewaySimulation.objects.get(uuid=request_id)
     simulation.simulation_started = timezone.now()
     simulation.save()
+    get_opengribs_data(simulation.longitude, simulation.latitude)
     params = [
         "docker",
         "run",
@@ -33,7 +34,7 @@ def run_leeway_simulation(request_id):
         f"{settings.SIMULATION_SCRIPT_PATH}:/code/leeway/simulation.py",
         "opendrift-leeway-custom:latest",
         "python3",
-        "leeway/simulation.py",
+        "/code/leeway/simulation.py",
         "--longitude",
         str(simulation.longitude),
         "--latitude",
@@ -50,7 +51,9 @@ def run_leeway_simulation(request_id):
         str(simulation.duration),
         "--id",
         str(simulation.uuid),
+        "--no-web",
     ]
+    print(" ".join(params))
     with subprocess.Popen(
         params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
     ) as sim_proc:
