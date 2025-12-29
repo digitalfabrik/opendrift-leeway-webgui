@@ -10,6 +10,7 @@ docker run -it --volume ./simulation:/code/leeway opendrift/opendrift python3 le
 
 import argparse
 import os
+import sys
 import uuid
 from datetime import datetime, timedelta
 
@@ -25,8 +26,10 @@ from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap
 
 # pylint: disable=import-error, disable=no-name-in-module
+import copernicusmarine
 from opendrift.models.leeway import Leeway
 from opendrift.readers import reader_global_landmask
+from opendrift.readers.reader_netCDF_CF_generic import Reader
 
 INPUTDIR = "/code/leeway/input"
 
@@ -85,23 +88,46 @@ def main():
     args = parser.parse_args()
 
     simulation = Leeway(loglevel=50)
-    sources = [
+
+    local_sources = [
         os.path.join(INPUTDIR, data_file)
         for data_file in os.listdir(INPUTDIR)
         if data_file.endswith(".nc")
     ]
-
-    if not args.no_web:
-        sources.extend(
-            (
-                "https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest",
+    if local_sources:
+        sources = local_sources
+    elif not args.no_web:
+        if "COPERNICUSMARINE_SERVICE_USERNAME" in os.environ:
+            print("Using CMEMS")
+            cmems_dataset_ids = [
+                "cmems_mod_med_phy-cur_anfc_4.2km_PT15M-i",
+                "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i",
+                "cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H",
+            ]
+            print("Using sources:\n - {}".format("\n - ".join(cmems_dataset_ids)))
+            readers = []
+            for dataset_id in cmems_dataset_ids:
+                try:
+                    ds = copernicusmarine.open_dataset(dataset_id=dataset_id, chunk_size_limit=0)
+                    print(f"Opened {dataset_id}:")
+                    print(ds)
+                except Exception as exc:
+                    print(f"ERROR opening {dataset_id}: {exc}", file=sys.stderr)
+                    raise
+                readers.append(Reader(ds, name=dataset_id))
+            simulation.add_reader(readers)
+            sources = [
                 "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
-            )
-        )
+            ]
+            simulation.add_readers_from_list(sources, lazy=False)
 
-    print("Using sources:\n - {}".format("\n - ".join(sources)))
-
-    simulation.add_readers_from_list(sources, lazy=True)
+    else:
+        sources = [
+            "https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest",
+            "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
+        ]
+        print("Using sources:\n - {}".format("\n - ".join(sources)))
+        simulation.add_readers_from_list(sources, lazy=False)
 
     reader_landmask = reader_global_landmask.Reader()
     simulation.add_reader([reader_landmask])

@@ -1,10 +1,13 @@
+import mimetypes
+from pathlib import Path
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import FileResponse, Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.list import ListView
@@ -118,3 +121,38 @@ class LeewaySimulationDeleteView(LoginRequiredMixin, DeleteView):
             self.get_object().delete()
             return HttpResponseRedirect("/simulations")
         return HttpResponseForbidden("Cannot delete other's simulations")
+
+
+class SimulationFileView(LoginRequiredMixin, View):
+    """
+    Serve simulation output files (PNG, NetCDF) with login and ownership protection.
+
+    The filename stem must match the UUID of an existing simulation owned by the
+    requesting user. Any other request is rejected with 403 or 404.
+    """
+
+    def get(self, request, path):
+        """
+        Serve the requested simulation file if the user owns it.
+        """
+        file_path = Path(settings.SIMULATION_OUTPUT) / path
+
+        # Only allow a flat filename — no directory traversal
+        if Path(path).parent != Path("."):
+            raise Http404
+
+        if not file_path.is_file():
+            raise Http404
+
+        # Extract UUID from filename stem and verify ownership
+        uuid_str = file_path.stem
+        try:
+            simulation = LeewaySimulation.objects.get(uuid=uuid_str)
+        except (LeewaySimulation.DoesNotExist, ValueError):
+            raise Http404
+
+        if simulation.user != request.user:
+            return HttpResponseForbidden("You do not have permission to access this file.")
+
+        content_type, _ = mimetypes.guess_type(str(file_path))
+        return FileResponse(file_path.open("rb"), content_type=content_type or "application/octet-stream")
