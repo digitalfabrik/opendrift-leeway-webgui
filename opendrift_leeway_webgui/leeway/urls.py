@@ -5,8 +5,6 @@ See :mod:`~opendrift_leeway_webgui.core.urls` for the other namespaces of this p
 For more information on this file, see :doc:`django:topics/http/urls`.
 """
 
-from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import include, path
 
 from .views import (
@@ -16,6 +14,7 @@ from .views import (
     LeewaySimulationDetailView,
     LeewaySimulationDocumentation,
     LeewaySimulationListView,
+    SimulationFileView,
 )
 
 #: The url patterns of this module (see :doc:`django:topics/http/urls`)
@@ -49,19 +48,6 @@ urlpatterns = [
     ),
 ]
 
-# Serve simulation files in debug mode
-if settings.DEBUG:
-    urlpatterns += [
-        path(
-            "",
-            include(
-                (
-                    static(
-                        settings.SIMULATION_URL,
-                        document_root=settings.SIMULATION_OUTPUT,
-                    ),
-                    "simulation_files",
-                )
-            ),
-        )
-    ]
+urlpatterns += [
+    path("simulation-files/<path:path>", SimulationFileView.as_view(), name="simulation_file"),
+]

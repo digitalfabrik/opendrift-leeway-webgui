@@ -25,6 +25,8 @@ dependencies = [
     "dms2dec",
     "drf-spectacular",
     "redis",
+    "uvicorn",
+    "gunicorn"
 ]
 
 [project.urls]

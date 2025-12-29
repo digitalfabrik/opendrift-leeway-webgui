@@ -27,6 +27,14 @@ def run_leeway_simulation(request_id):
     params = [
         "docker",
         "run",
+        "-e",
+        f"COPERNICUSMARINE_SERVICE_USERNAME={settings.COPERNICUSMARINE_SERVICE_USERNAME}",
+        "-e",
+        f"COPERNICUSMARINE_SERVICE_PASSWORD={settings.COPERNICUSMARINE_SERVICE_PASSWORD}",
+        "-e",
+        f"COPERNICUSMARINE_USERNAME={settings.COPERNICUSMARINE_SERVICE_USERNAME}",
+        "-e",
+        f"COPERNICUSMARINE_PASSWORD={settings.COPERNICUSMARINE_SERVICE_PASSWORD}",
         "--volume",
         f"{settings.SIMULATION_ROOT}:/code/leeway",
         "--volume",
@@ -51,11 +59,12 @@ def run_leeway_simulation(request_id):
         "--id",
         str(simulation.uuid),
     ]
+
     with subprocess.Popen(
         params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
     ) as sim_proc:
         stdout, stderr = sim_proc.communicate()
-    logger.debug("Output from simulation %s: %s", simulation.uuid, stdout)
+    logger.info("Output from simulation %s: %s", simulation.uuid, stdout)
     if stderr:
         logger.error("Error during simulation %s: %s", simulation.uuid, stderr)
         simulation.traceback = stderr.strip()

@@ -52,6 +52,10 @@ ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]"] + [
     x.strip() for x in os.environ.get("LEEWAY_ALLOWED_HOSTS", "").split(",") if x
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{host}" for host in ALLOWED_HOSTS
+]
+
 #: Enabled applications (see :setting:`django:INSTALLED_APPS`)
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -240,6 +244,10 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "console-colored",
         },
+        "console-always": {
+            "class": "logging.StreamHandler",
+            "formatter": "console-colored",
+        },
         "logfile": {
             "class": "logging.FileHandler",
             "filename": LOGFILE,
@@ -249,11 +257,11 @@ LOGGING = {
     "loggers": {
         # Loggers of opendrift-leeway-webgui django apps
         "opendrift_leeway_webgui": {
-            "handlers": ["console-colored", "logfile"],
+            "handlers": ["console-always", "logfile"],
             "level": LOG_LEVEL,
         },
         # Loggers of dependencies
-        "celery": {"handlers": ["console", "logfile"], "level": DEPS_LOG_LEVEL},
+        "celery": {"handlers": ["console-always", "logfile"], "level": "INFO"},
         "django": {"handlers": ["console", "logfile"], "level": DEPS_LOG_LEVEL},
         "dms2dec": {"handlers": ["console", "logfile"], "level": DEPS_LOG_LEVEL},
         "redis": {"handlers": ["console", "logfile"], "level": DEPS_LOG_LEVEL},
@@ -365,3 +373,6 @@ EMAIL_USE_TLS = bool(strtobool(os.environ.get("LEEWAY_EMAIL_USE_TLS", "True")))
 #: In most email documentation this type of TLS connection is referred to as SSL. It is generally used on port 465.
 #: (see :setting:`django:EMAIL_USE_SSL`)
 EMAIL_USE_SSL = bool(strtobool(os.environ.get("LEEWAY_EMAIL_USE_SSL", "False")))
+
+COPERNICUSMARINE_SERVICE_USERNAME = os.environ.get("LEEWAY_COPERNICUSMARINE_SERVICE_USERNAME")
+COPERNICUSMARINE_SERVICE_PASSWORD = os.environ.get("LEEWAY_COPERNICUSMARINE_SERVICE_PASSWORD")
