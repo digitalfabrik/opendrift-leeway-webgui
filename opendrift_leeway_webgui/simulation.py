@@ -143,14 +143,22 @@ def main():
 
     outfile = os.path.join("/tmp/code", "leeway", "output", args.id)
 
-    simulation.run(
+    ds = simulation.run(
         duration=timedelta(hours=args.duration), time_step=600, outfile=f"{outfile}.nc"
     )
 
     # Plotting results
-    lon, lat = np.array(simulation.get_lonlats())
+    lon = ds['lon'].values
+    lat = ds['lat'].values
     lon[lon == 0] = np.nan
     lat[lat == 0] = np.nan
+
+    segments = [
+    [(float(lo), float(la)) for lo, la in zip(lon_row, lat_row)]
+    for lon_row, lat_row in zip(lon, lat)
+    ]
+    
+    geojson = segments_to_geojson(segments)
 
     crs = ccrs.Mercator()  # Mercator projection to have angle true projection
     gcrs = ccrs.PlateCarree(globe=crs.globe)  # PlateCarree for straight lines
@@ -369,6 +377,28 @@ def get_zebra_line(points, gcrs):
     lc.set_linewidth(4)
     return lc
 
+def segments_to_geojson(segments):
+    """
+    Convert a list of segments to a GeoJSON GeometryCollection of LineStrings.
+    
+    Parameters:
+        segments: list of shape (N, 2+) where each element is a list of (lon, lat) points
+    
+    Returns:
+        dict: GeoJSON GeometryCollection
+    """
+    geometries = [
+        {
+            "type": "LineString",
+            "coordinates": [list(point) for point in line]
+        }
+        for line in segments
+    ]
+
+    return {
+        "type": "GeometryCollection",
+        "geometries": geometries
+    }
 
 if __name__ == "__main__":
     main()
