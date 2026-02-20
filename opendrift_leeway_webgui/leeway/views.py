@@ -4,7 +4,12 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import FileResponse, Http404, HttpResponseForbidden, HttpResponseRedirect
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+)
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView, View
@@ -131,14 +136,33 @@ class SimulationFileView(LoginRequiredMixin, View):
     requesting user. Any other request is rejected with 403 or 404.
     """
 
+    #: Only these extensions are ever written by the simulation task
+    ALLOWED_EXTENSIONS = {".png", ".nc", ".geojson"}
+
     def get(self, request, path):
         """
         Serve the requested simulation file if the user owns it.
         """
-        file_path = Path(settings.SIMULATION_OUTPUT) / path
+        # Reject null bytes
+        if "\x00" in path:
+            raise Http404
 
-        # Only allow a flat filename — no directory traversal
-        if Path(path).parent != Path("."):
+        # Reject anything that is not a bare filename (no directory component)
+        if Path(path).name != path:
+            raise Http404
+
+        # Reject disallowed extensions
+        if Path(path).suffix not in self.ALLOWED_EXTENSIONS:
+            raise Http404
+
+        base_dir = Path(settings.SIMULATION_OUTPUT).resolve()
+        file_path = (base_dir / path).resolve()
+
+        # Defence in depth: ensure the resolved path is still inside base_dir
+        # (catches symlink escapes and any edge cases not caught above)
+        try:
+            file_path.relative_to(base_dir)
+        except ValueError:
             raise Http404
 
         if not file_path.is_file():
@@ -152,7 +176,12 @@ class SimulationFileView(LoginRequiredMixin, View):
             raise Http404
 
         if simulation.user != request.user:
-            return HttpResponseForbidden("You do not have permission to access this file.")
+            return HttpResponseForbidden(
+                "You do not have permission to access this file."
+            )
 
         content_type, _ = mimetypes.guess_type(str(file_path))
-        return FileResponse(file_path.open("rb"), content_type=content_type or "application/octet-stream")
+        return FileResponse(
+            file_path.open("rb"),
+            content_type=content_type or "application/octet-stream",
+        )

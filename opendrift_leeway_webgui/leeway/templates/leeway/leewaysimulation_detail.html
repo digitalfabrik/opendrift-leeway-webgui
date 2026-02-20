@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
     <h2>Leeway Simulation {{ object.uuid }}</h2>
-    <p class="error">
-        <b>{{ object.error|default_if_none:"" }}</b>
-    </p>
+    <p class="error-label">{{ object.error|default_if_none:"" }}</p>
     <pre>{{ object.traceback }}</pre>
 {% endblock content %}

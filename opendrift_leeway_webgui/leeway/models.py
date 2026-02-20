@@ -41,6 +41,11 @@ class LeewaySimulation(models.Model):
     netcdf = models.FileField(
         null=True, storage=simulation_storage, verbose_name=_("NetCDF file")
     )
+    geojson = models.FileField(
+        null=True,
+        storage=simulation_storage,
+        verbose_name=_("GeoJSON of simulated trajectories"),
+    )
     traceback = models.TextField(blank=True, verbose_name=_("traceback"))
 
     @property

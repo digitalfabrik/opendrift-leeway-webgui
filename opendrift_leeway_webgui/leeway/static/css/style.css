@@ -1,33 +1,342 @@
-/* Form table */
-table {
-    border-spacing: 5 10px;
-}
-th {
-    text-align: center;
-}
-td {
-    text-align: center;
-}
-.errorlist {
-    font-weight: bold;
-    color: red;
-    list-style-type: none;
-    padding: 0;
+/* ── Custom properties ─────────────────────────────────────────── */
+:root {
+  --navy:         #1a2e4a;
+  --navy-dark:    #111e30;
+  --accent:       #2e86c1;
+  --accent-hover: #1a6699;
+  --bg:           #f0f4f8;
+  --card-bg:      #ffffff;
+  --text:         #1c2b3a;
+  --text-muted:   #5a6a7a;
+  --border:       #d0dae4;
+  --radius:       8px;
+  --shadow:       0 2px 12px rgba(26, 46, 74, 0.10);
 }
 
-/* Success/error messages */
+/* ── Reset & base ──────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: var(--accent-hover);
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+header {
+  background: var(--navy);
+  color: #fff;
+  padding: 0 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+
+.site-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-title:hover {
+  color: #cce0f0;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+nav a,
+nav button {
+  color: #cce0f0;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+nav a:hover,
+nav button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* ── Main content card ─────────────────────────────────────────── */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 2rem auto;
+  padding: 0 1rem 3rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--accent);
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 1.5rem 0 0.6rem;
+}
+
+p {
+  line-height: 1.7;
+  margin-bottom: 0.9rem;
+}
+
+ol, ul {
+  padding-left: 1.4rem;
+  margin-bottom: 0.9rem;
+  line-height: 1.7;
+}
+
+pre {
+  background: #eef2f7;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  margin: 0.4rem 0 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin-top: 0.5rem;
+}
+
+/* ── Messages ──────────────────────────────────────────────────── */
 .messages {
-    font-weight: bold;
+  margin-bottom: 1.5rem;
 }
-.success {
-    color: green;
+
+.messages p {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  border-left: 4px solid;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
-.info {
-    color: blue;
+
+.messages .success {
+  background: #eafaf1;
+  border-color: #27ae60;
+  color: #1e8449;
 }
-.warning {
-    color: orange;
+
+.messages .info {
+  background: #eaf4fb;
+  border-color: var(--accent);
+  color: #1a5276;
 }
-.error {
-    color: red;
+
+.messages .warning {
+  background: #fef9e7;
+  border-color: #f39c12;
+  color: #935e0a;
+}
+
+.messages .error {
+  background: #fdedec;
+  border-color: #e74c3c;
+  color: #922b21;
+}
+
+/* ── Forms ─────────────────────────────────────────────────────── */
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+  color: var(--text);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="datetime-local"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text);
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.18);
+}
+
+/* Django as_table / as_p form layout */
+form table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+form table tr {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.1rem;
+}
+
+form table th {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  text-align: left;
+  padding: 0 0 0.3rem;
+  border: none;
+  background: none;
+}
+
+form table td {
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+button[type="submit"] {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.55rem 1.6rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+button[type="submit"]:hover {
+  background: var(--accent-hover);
+}
+
+.errorlist {
+  font-weight: 600;
+  color: #c0392b;
+  list-style-type: none;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  font-size: 0.875rem;
+}
+
+/* ── Data tables (list view, documentation) ────────────────────── */
+table.data-table,
+table.tg {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+table.data-table th,
+table.tg th {
+  background: var(--navy);
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+table.data-table td,
+table.tg td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  color: var(--text);
+}
+
+table.data-table tr:nth-child(even) td,
+table.tg tr:nth-child(even) td {
+  background: #f7fafc;
+}
+
+table.data-table tr:hover td,
+table.tg tr:hover td {
+  background: #eaf4fb;
+}
+
+/* ── Detail view ───────────────────────────────────────────────── */
+.error-label {
+  font-weight: 700;
+  color: #c0392b;
+  margin-bottom: 0.5rem;
 }
