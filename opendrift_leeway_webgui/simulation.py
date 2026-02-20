@@ -285,16 +285,25 @@ def main():
     xloc = ticker.FixedLocator(x_ticks)
     yloc = ticker.FixedLocator(y_ticks)
 
-    longitude_formatter = gridliner.LongitudeFormatter(dms=True, auto_hide=False)
-    latitude_formatter = gridliner.LatitudeFormatter(dms=True, auto_hide=False)
+    longitude_formatter = gridliner.LongitudeFormatter(
+        dms=True, auto_hide=False, number_format=".0f"
+    )
+    latitude_formatter = gridliner.LatitudeFormatter(
+        dms=True, auto_hide=False, number_format=".0f"
+    )
 
     gl = ax.gridlines(
         draw_labels=True, linewidth=1, color="gray", alpha=0.5, rotate_labels=True
     )
     gl.ylocator = yloc
     gl.xlocator = xloc
+    # Labels on bottom and right only (set both old and new cartopy attribute names)
     gl.xlabels_top = False
     gl.ylabels_left = False
+    gl.top_labels = False
+    gl.bottom_labels = True
+    gl.left_labels = False
+    gl.right_labels = True
     gl.xformatter = longitude_formatter
     gl.yformatter = latitude_formatter
 
