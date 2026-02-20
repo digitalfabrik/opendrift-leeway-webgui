@@ -36,7 +36,7 @@ def run_leeway_simulation(request_id):
         "-e",
         f"COPERNICUSMARINE_PASSWORD={settings.COPERNICUSMARINE_SERVICE_PASSWORD}",
         "--volume",
-        f"{settings.SIMULATION_ROOT}:/code/leeway",
+        f"{settings.SIMULATION_ROOT}:/tmp/code/leeway",
         "--volume",
         f"{settings.SIMULATION_SCRIPT_PATH}:/code/leeway/simulation.py",
         "opendrift-leeway-custom:latest",
