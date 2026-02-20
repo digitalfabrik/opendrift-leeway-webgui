@@ -59,7 +59,7 @@ def run_leeway_simulation(request_id):
         "--id",
         str(simulation.uuid),
     ]
-
+    logger.warn(" ".join(params))
     with subprocess.Popen(
         params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
     ) as sim_proc:
