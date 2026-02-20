@@ -29,7 +29,7 @@ from opendrift.models.leeway import Leeway
 from opendrift.readers import reader_global_landmask
 from opendrift.readers.reader_netCDF_CF_generic import Reader
 
-INPUTDIR = "/code/leeway/input"
+INPUTDIR = "/tmp/code/leeway/input"
 
 
 # pylint: disable=too-many-locals, disable=too-many-statements
