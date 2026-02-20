@@ -25,6 +25,9 @@ class LeewaySimulationViewSet(
     #: The serializer to use for simulations
     serializer_class = LeewaySimulationSerializer
 
+    #: Use UUID as the lookup field instead of the integer primary key
+    lookup_field = "uuid"
+
     def get_queryset(self):
         """
         Only return the simulations of the current user

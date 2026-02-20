@@ -9,6 +9,7 @@ docker run -it --volume ./simulation:/code/leeway opendrift/opendrift python3 le
 """
 
 import argparse
+import json
 import os
 import sys
 import uuid
@@ -16,22 +17,20 @@ from datetime import datetime, timedelta
 
 # pylint: disable=import-error
 import cartopy.crs as ccrs
+# pylint: disable=import-error, disable=no-name-in-module
+import copernicusmarine
 import matplotlib.pyplot as plt
 import numpy as np
-
 # pylint: disable=import-error
 from cartopy.mpl import gridliner
 from matplotlib import ticker
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap
-
-# pylint: disable=import-error, disable=no-name-in-module
-import copernicusmarine
 from opendrift.models.leeway import Leeway
 from opendrift.readers import reader_global_landmask
 from opendrift.readers.reader_netCDF_CF_generic import Reader
 
-INPUTDIR = "/code/leeway/input"
+INPUTDIR = "/tmp/code/leeway/input"
 
 
 # pylint: disable=too-many-locals, disable=too-many-statements
@@ -108,7 +107,9 @@ def main():
             readers = []
             for dataset_id in cmems_dataset_ids:
                 try:
-                    ds = copernicusmarine.open_dataset(dataset_id=dataset_id, chunk_size_limit=0)
+                    ds = copernicusmarine.open_dataset(
+                        dataset_id=dataset_id, chunk_size_limit=0
+                    )
                     print(f"Opened {dataset_id}:")
                     print(ds)
                 except Exception as exc:
@@ -117,7 +118,7 @@ def main():
                 readers.append(Reader(ds, name=dataset_id))
             simulation.add_reader(readers)
             sources = [
-                "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
+                "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd"
             ]
             simulation.add_readers_from_list(sources, lazy=False)
 
@@ -141,16 +142,24 @@ def main():
         object_type=args.object_type,
     )
 
-    outfile = os.path.join("/code", "leeway", "output", args.id)
+    outfile = os.path.join("/tmp/code", "leeway", "output", args.id)
 
-    simulation.run(
+    ds = simulation.run(
         duration=timedelta(hours=args.duration), time_step=600, outfile=f"{outfile}.nc"
     )
 
     # Plotting results
-    lon, lat = np.array(simulation.get_lonlats())
+    lon = ds["lon"].values
+    lat = ds["lat"].values
     lon[lon == 0] = np.nan
     lat[lat == 0] = np.nan
+
+    segments = [
+        [(float(lo), float(la)) for lo, la in zip(lon_row, lat_row)]
+        for lon_row, lat_row in zip(lon, lat)
+    ]
+
+    geojson = segments_to_geojson(segments)
 
     crs = ccrs.Mercator()  # Mercator projection to have angle true projection
     gcrs = ccrs.PlateCarree(globe=crs.globe)  # PlateCarree for straight lines
@@ -332,6 +341,8 @@ def main():
     )
 
     fig.savefig(f"{outfile}.png")
+    with open(f"{outfile}.geojson", "w") as fp:
+        json.dump(geojson, fp)
 
     print(f"Success: {outfile}.png written.")
 
@@ -368,6 +379,24 @@ def get_zebra_line(points, gcrs):
     lc.set_array(array)
     lc.set_linewidth(4)
     return lc
+
+
+def segments_to_geojson(segments):
+    """
+    Convert a list of segments to a GeoJSON GeometryCollection of LineStrings.
+
+    Parameters:
+        segments: list of shape (N, 2+) where each element is a list of (lon, lat) points
+
+    Returns:
+        dict: GeoJSON GeometryCollection
+    """
+    geometries = [
+        {"type": "LineString", "coordinates": [list(point) for point in line]}
+        for line in segments
+    ]
+
+    return {"type": "GeometryCollection", "geometries": geometries}
 
 
 if __name__ == "__main__":

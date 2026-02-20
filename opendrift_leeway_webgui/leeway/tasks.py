@@ -36,9 +36,9 @@ def run_leeway_simulation(request_id):
         "-e",
         f"COPERNICUSMARINE_PASSWORD={settings.COPERNICUSMARINE_SERVICE_PASSWORD}",
         "--volume",
-        f"{settings.SIMULATION_ROOT}:/code/leeway",
+        f"{settings.SIMULATION_ROOT}:/tmp/code/leeway",
         "--volume",
-        f"{settings.SIMULATION_SCRIPT_PATH}:/code/leeway/simulation.py",
+        f"{settings.SIMULATION_SCRIPT_PATH}:/tmp/code/leeway/simulation.py",
         "opendrift-leeway-custom:latest",
         "python3",
         "leeway/simulation.py",
@@ -59,7 +59,6 @@ def run_leeway_simulation(request_id):
         "--id",
         str(simulation.uuid),
     ]
-
     with subprocess.Popen(
         params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
     ) as sim_proc:
@@ -74,6 +73,11 @@ def run_leeway_simulation(request_id):
     img_filename = f"{simulation.uuid}.png"
     if (simulation_output / img_filename).is_file():
         simulation.img.name = img_filename
+
+    geojson_filename = f"{simulation.uuid}.geojson"
+    if (simulation_output / geojson_filename).is_file():
+        simulation.geojson.name = geojson_filename
+
     netcdf_filename = f"{simulation.uuid}.nc"
     if (simulation_output / netcdf_filename).is_file():
         simulation.netcdf.name = netcdf_filename

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <h2>List of Leeway Simulations</h2>
-    <table border=0>
+    <table class="data-table">
         <tr>
             <th>ID</th>
             <th>Longitude</th>
@@ -14,8 +14,8 @@
         {% for simulation in simulations %}
             <tr>
                 <td>{{ simulation.uuid }}</td>
-                <td>{{ simulation.longitude }}</td>
-                <td>{{ simulation.latitude }}</td>
+                <td>{{ simulation.longitude|floatformat:4 }}</td>
+                <td>{{ simulation.latitude|floatformat:4 }}</td>
                 <td>{{ simulation.start_time }}</td>
                 <td>{{ simulation.duration }}</td>
                 <td>{{ simulation.radius }}</td>
@@ -24,6 +24,7 @@
                         <a href="{% url "simulation_detail" pk=simulation.pk %}">Error</a>
                     {% endif %}
                     {% if simulation.img %}<a href="{{ simulation.img.url }}">Image</a>{% endif %}
+                    {% if simulation.geojson %}<a href="{{ simulation.geojson.url }}">GeoJSON</a>{% endif %}
                     {% if simulation.netcdf %}<a href="{{ simulation.netcdf.url }}">NetCDF</a>{% endif %}
                     <a href="{% url "simulation_delete" pk=simulation.pk %}">Delete</a>
                 </td>

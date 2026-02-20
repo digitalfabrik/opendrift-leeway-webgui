@@ -5,6 +5,7 @@
 <html lang="{{ LANGUAGE_CODE }}">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description"
               content="OpenDrift Leeway simulations for Search and Rescue operations" />
         <meta name="keywords"
@@ -13,26 +14,37 @@
         <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     </head>
     <body>
+        <header>
+            <div class="header-inner">
+                <a class="site-title" href="{% url 'index' %}">&#9875; Leeway Simulation</a>
+                <nav>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'simulation_form' %}">New Simulation</a>
+                        <a href="{% url 'simulation_list' %}">My Simulations</a>
+                        <a href="{% url 'simulation_documentation' %}">Documentation</a>
+                        <a href="https://github.com/digitalfabrik/opendrift-leeway-webgui">Source Code</a>
+                        <form method="post" action="{% url 'logout' %}" style="display:inline">
+                            {% csrf_token %}
+                            <button type="submit">Logout</button>
+                        </form>
+                    {% else %}
+                        <a href="https://github.com/digitalfabrik/opendrift-leeway-webgui">Source Code</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
         <main>
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}<p class="{{ message.level_tag }}">{{ message|linebreaksbr }}</p>{% endfor %}
-                </div>
-            {% endif %}
-            {% block content %}
-            {% endblock content %}
-            <p>
-                <a href="https://github.com/digitalfabrik/opendrift-leeway-webgui">Source Code</a>
-                {% if user.is_authenticated %}
-                    | <a href="{% url "simulation_documentation" %}">Documentation</a> | <a href="{% url "simulation_list" %}">List of simulations</a> | <a href="{% url "simulation_form" %}">New Simulation</a>
+            <div class="card">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p class="{{ message.level_tag }}">{{ message|linebreaksbr }}</p>
+                        {% endfor %}
+                    </div>
                 {% endif %}
-            </p>
-            {% if user.is_authenticated %}
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit">logout</button>
-                </form>
-            {% endif %}
+                {% block content %}
+                {% endblock content %}
+            </div>
         </main>
     </body>
 </html>
