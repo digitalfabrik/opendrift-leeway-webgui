@@ -52,9 +52,7 @@ ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]"] + [
     x.strip() for x in os.environ.get("LEEWAY_ALLOWED_HOSTS", "").split(",") if x
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    f"https://{host}" for host in ALLOWED_HOSTS
-]
+CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS]
 
 #: Enabled applications (see :setting:`django:INSTALLED_APPS`)
 INSTALLED_APPS = [
@@ -374,5 +372,9 @@ EMAIL_USE_TLS = bool(strtobool(os.environ.get("LEEWAY_EMAIL_USE_TLS", "True")))
 #: (see :setting:`django:EMAIL_USE_SSL`)
 EMAIL_USE_SSL = bool(strtobool(os.environ.get("LEEWAY_EMAIL_USE_SSL", "False")))
 
-COPERNICUSMARINE_SERVICE_USERNAME = os.environ.get("LEEWAY_COPERNICUSMARINE_SERVICE_USERNAME")
-COPERNICUSMARINE_SERVICE_PASSWORD = os.environ.get("LEEWAY_COPERNICUSMARINE_SERVICE_PASSWORD")
+COPERNICUSMARINE_SERVICE_USERNAME = os.environ.get(
+    "LEEWAY_COPERNICUSMARINE_SERVICE_USERNAME"
+)
+COPERNICUSMARINE_SERVICE_PASSWORD = os.environ.get(
+    "LEEWAY_COPERNICUSMARINE_SERVICE_PASSWORD"
+)

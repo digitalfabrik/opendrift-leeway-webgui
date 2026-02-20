@@ -4,7 +4,12 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import FileResponse, Http404, HttpResponseForbidden, HttpResponseRedirect
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+)
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView, View
@@ -152,7 +157,12 @@ class SimulationFileView(LoginRequiredMixin, View):
             raise Http404
 
         if simulation.user != request.user:
-            return HttpResponseForbidden("You do not have permission to access this file.")
+            return HttpResponseForbidden(
+                "You do not have permission to access this file."
+            )
 
         content_type, _ = mimetypes.guess_type(str(file_path))
-        return FileResponse(file_path.open("rb"), content_type=content_type or "application/octet-stream")
+        return FileResponse(
+            file_path.open("rb"),
+            content_type=content_type or "application/octet-stream",
+        )

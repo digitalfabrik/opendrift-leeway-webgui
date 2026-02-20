@@ -49,5 +49,9 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path("simulation-files/<path:path>", SimulationFileView.as_view(), name="simulation_file"),
+    path(
+        "simulation-files/<path:path>",
+        SimulationFileView.as_view(),
+        name="simulation_file",
+    )
 ]

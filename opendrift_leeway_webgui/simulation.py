@@ -16,17 +16,15 @@ from datetime import datetime, timedelta
 
 # pylint: disable=import-error
 import cartopy.crs as ccrs
+# pylint: disable=import-error, disable=no-name-in-module
+import copernicusmarine
 import matplotlib.pyplot as plt
 import numpy as np
-
 # pylint: disable=import-error
 from cartopy.mpl import gridliner
 from matplotlib import ticker
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap
-
-# pylint: disable=import-error, disable=no-name-in-module
-import copernicusmarine
 from opendrift.models.leeway import Leeway
 from opendrift.readers import reader_global_landmask
 from opendrift.readers.reader_netCDF_CF_generic import Reader
@@ -108,7 +106,9 @@ def main():
             readers = []
             for dataset_id in cmems_dataset_ids:
                 try:
-                    ds = copernicusmarine.open_dataset(dataset_id=dataset_id, chunk_size_limit=0)
+                    ds = copernicusmarine.open_dataset(
+                        dataset_id=dataset_id, chunk_size_limit=0
+                    )
                     print(f"Opened {dataset_id}:")
                     print(ds)
                 except Exception as exc:
@@ -117,7 +117,7 @@ def main():
                 readers.append(Reader(ds, name=dataset_id))
             simulation.add_reader(readers)
             sources = [
-                "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
+                "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd"
             ]
             simulation.add_readers_from_list(sources, lazy=False)
 

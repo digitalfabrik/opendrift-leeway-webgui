@@ -9,9 +9,7 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault(
-    "DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings"
-)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings")
 
 # Read config from config file
 config = configparser.ConfigParser(interpolation=None)
