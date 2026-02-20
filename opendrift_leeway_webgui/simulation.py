@@ -141,7 +141,7 @@ def main():
         object_type=args.object_type,
     )
 
-    outfile = os.path.join("/code", "leeway", "output", args.id)
+    outfile = os.path.join("/tmp/code", "leeway", "output", args.id)
 
     simulation.run(
         duration=timedelta(hours=args.duration), time_step=600, outfile=f"{outfile}.nc"
