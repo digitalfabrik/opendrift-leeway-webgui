@@ -38,7 +38,7 @@ def run_leeway_simulation(request_id):
         "--volume",
         f"{settings.SIMULATION_ROOT}:/tmp/code/leeway",
         "--volume",
-        f"{settings.SIMULATION_SCRIPT_PATH}:/code/leeway/simulation.py",
+        f"{settings.SIMULATION_SCRIPT_PATH}:/tmp/code/leeway/simulation.py",
         "opendrift-leeway-custom:latest",
         "python3",
         "leeway/simulation.py",
