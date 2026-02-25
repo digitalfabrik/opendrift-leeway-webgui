@@ -92,10 +92,12 @@ load-plugins = [
     "pylint.extensions.consider_ternary_expression",
 ]
 django-settings-module="opendrift_leeway_webgui.core.settings"
+ignore-paths = ["^.*/migrations/.*$"]
 
 [tool.pylint.messages_control]
 disable = [
   "missing-module-docstring",
+  "duplicate-code",
 ]
 enable = ["useless-suppression"]
 

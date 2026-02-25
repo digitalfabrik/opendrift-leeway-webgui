@@ -105,6 +105,10 @@ nav button:hover {
   text-decoration: none;
 }
 
+nav .logout-form {
+  display: inline;
+}
+
 /* ── Main content card ─────────────────────────────────────────── */
 main {
   flex: 1;

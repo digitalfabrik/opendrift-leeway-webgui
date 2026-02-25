@@ -35,7 +35,7 @@ from opendrift.readers.reader_netCDF_CF_generic import Reader
 INPUTDIR = "/tmp/code/leeway/input"
 
 
-# pylint: disable=too-many-locals, disable=too-many-statements
+# pylint: disable=too-many-locals, too-many-statements, too-many-branches
 def main():
     """Run opendrift leeway simulation"""
     parser = argparse.ArgumentParser(description="Simulate drift of object")
@@ -86,6 +86,7 @@ def main():
         action="store_true",
         default=False,
     )
+
     args = parser.parse_args()
 
     simulation = Leeway(loglevel=50)
@@ -95,17 +96,24 @@ def main():
         for data_file in os.listdir(INPUTDIR)
         if data_file.endswith(".nc")
     ]
+    sources = []
     if local_sources:
-        sources = local_sources
+        sources += local_sources
     elif not args.no_web:
-        if "COPERNICUSMARINE_SERVICE_USERNAME" in os.environ:
+        if os.environ.get("COPERNICUSMARINE_SERVICE_USERNAME") not in (
+            None,
+            "",
+            "None",
+        ):
             print("Using CMEMS")
             cmems_dataset_ids = [
                 "cmems_mod_med_phy-cur_anfc_4.2km_PT15M-i",
                 "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i",
                 "cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H",
             ]
-            print("Using sources:\n - {}".format("\n - ".join(cmems_dataset_ids)))
+            print(
+                "Using CMEMS datasets:\n - {}".format("\n - ".join(cmems_dataset_ids))
+            )
             readers = []
             for dataset_id in cmems_dataset_ids:
                 try:
@@ -119,18 +127,16 @@ def main():
                     raise
                 readers.append(Reader(ds, name=dataset_id))
             simulation.add_reader(readers)
-            sources = [
+            sources += [
                 "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd"
             ]
-            simulation.add_readers_from_list(sources, lazy=False)
-
-    else:
-        sources = [
-            "https://tds.hycom.org/thredds/dodsC/GLBy0.08/latest",
-            "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
-        ]
-        print("Using sources:\n - {}".format("\n - ".join(sources)))
-        simulation.add_readers_from_list(sources, lazy=False)
+        else:
+            sources += [
+                "https://tds.hycom.org/thredds/dodsC/FMRC_ESPC-D-V02_uv3z/FMRC_ESPC-D-V02_uv3z_best.ncd",
+                "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
+            ]
+    print("Using sources:\n - {}".format("\n - ".join(sources)))
+    simulation.add_readers_from_list(sources, lazy=False)
 
     reader_landmask = reader_global_landmask.Reader()
     simulation.add_reader([reader_landmask])
@@ -352,7 +358,7 @@ def main():
     )
 
     fig.savefig(f"{outfile}.png")
-    with open(f"{outfile}.geojson", "w") as fp:
+    with open(f"{outfile}.geojson", "w", encoding="utf-8") as fp:
         json.dump(geojson, fp)
 
     print(f"Success: {outfile}.png written.")

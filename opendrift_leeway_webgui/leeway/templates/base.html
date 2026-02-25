@@ -16,14 +16,14 @@
     <body>
         <header>
             <div class="header-inner">
-                <a class="site-title" href="{% url 'index' %}">&#9875; Leeway Simulation</a>
+                <a class="site-title" href="{% url 'index' %}">⚓ Leeway Simulation</a>
                 <nav>
                     {% if user.is_authenticated %}
                         <a href="{% url 'simulation_form' %}">New Simulation</a>
                         <a href="{% url 'simulation_list' %}">My Simulations</a>
                         <a href="{% url 'simulation_documentation' %}">Documentation</a>
                         <a href="https://github.com/digitalfabrik/opendrift-leeway-webgui">Source Code</a>
-                        <form method="post" action="{% url 'logout' %}" style="display:inline">
+                        <form method="post" action="{% url 'logout' %}" class="logout-form">
                             {% csrf_token %}
                             <button type="submit">Logout</button>
                         </form>

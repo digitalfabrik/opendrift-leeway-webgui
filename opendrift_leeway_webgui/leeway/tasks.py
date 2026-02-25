@@ -1,4 +1,5 @@
 import logging
+import os
 import subprocess
 from datetime import timedelta
 from pathlib import Path
@@ -27,6 +28,12 @@ def run_leeway_simulation(request_id):
     params = [
         "docker",
         "run",
+        "--user",
+        f"{os.getuid()}:{os.getgid()}",
+        "-e",
+        "HOME=/tmp/code/leeway",
+        "-e",
+        "MPLCONFIGDIR=/tmp/code/leeway/.matplotlib",
         "-e",
         f"COPERNICUSMARINE_SERVICE_USERNAME={settings.COPERNICUSMARINE_SERVICE_USERNAME}",
         "-e",
@@ -73,6 +80,8 @@ def run_leeway_simulation(request_id):
     img_filename = f"{simulation.uuid}.png"
     if (simulation_output / img_filename).is_file():
         simulation.img.name = img_filename
+    else:
+        logger.error("Could not find simulation result.")
 
     geojson_filename = f"{simulation.uuid}.geojson"
     if (simulation_output / geojson_filename).is_file():
