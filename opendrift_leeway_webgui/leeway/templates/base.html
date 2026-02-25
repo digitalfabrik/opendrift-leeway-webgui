@@ -37,9 +37,7 @@
             <div class="card">
                 {% if messages %}
                     <div class="messages">
-                        {% for message in messages %}
-                            <p class="{{ message.level_tag }}">{{ message|linebreaksbr }}</p>
-                        {% endfor %}
+                        {% for message in messages %}<p class="{{ message.level_tag }}">{{ message|linebreaksbr }}</p>{% endfor %}
                     </div>
                 {% endif %}
                 {% block content %}
