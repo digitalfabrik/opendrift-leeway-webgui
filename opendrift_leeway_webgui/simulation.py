@@ -17,10 +17,12 @@ from datetime import datetime, timedelta
 
 # pylint: disable=import-error
 import cartopy.crs as ccrs
+
 # pylint: disable=import-error, disable=no-name-in-module
 import copernicusmarine
 import matplotlib.pyplot as plt
 import numpy as np
+
 # pylint: disable=import-error
 from cartopy.mpl import gridliner
 from matplotlib import ticker

@@ -4,12 +4,7 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import (
-    FileResponse,
-    Http404,
-    HttpResponseForbidden,
-    HttpResponseRedirect,
-)
+from django.http import FileResponse, Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView, View
@@ -121,11 +116,11 @@ class LeewaySimulationDeleteView(LoginRequiredMixin, DeleteView):
     model = LeewaySimulation
     success_url = reverse_lazy("simulation_list")
 
-    def get(self, request, *args, **kwargs):
-        if self.get_object().user == request.user:
-            self.get_object().delete()
-            return HttpResponseRedirect("/simulations")
-        return HttpResponseForbidden("Cannot delete other's simulations")
+    def get_queryset(self):
+        """
+        Only return simulations of the current user to prevent deleting other users' simulations
+        """
+        return super().get_queryset().filter(user=self.request.user)
 
 
 class SimulationFileView(LoginRequiredMixin, View):
