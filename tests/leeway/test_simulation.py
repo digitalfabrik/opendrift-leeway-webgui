@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from django.core import mail
@@ -10,7 +10,7 @@ from opendrift_leeway_webgui.leeway.models import LeewaySimulation
 
 # pylint: disable=unused-argument
 @pytest.mark.django_db(transaction=True)
-def test_simulation(admin_client, settings, celery_app, celery_worker):
+def test_simulation(admin_client, settings, celery_worker, uuid_store):
     """
     Test whether simulation works as expected
     """
@@ -24,8 +24,10 @@ def test_simulation(admin_client, settings, celery_app, celery_worker):
             "latitude": "33°58'44.3\"",
             "longitude": "11°21'13.4\"",
             "object_type": 27,
-            "start_time": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "duration": 12,
+            "start_time": (datetime.now() - timedelta(hours=12)).strftime(
+                "%Y-%m-%d %H:%M"
+            ),
+            "duration": 2,
             "radius": 1000,
         },
     )
@@ -50,8 +52,8 @@ def test_simulation(admin_client, settings, celery_app, celery_worker):
     response = admin_client.get(simulation_list)
     assert response.status_code == 200
     assert f"<td>{uuid}</td>" in response.content.decode("utf-8")
-    # Print the UUID to stdout to enable the teardown method to check the image
-    print(uuid)
+    # Store the UUID so the teardown fixture can check the simulation result
+    uuid_store.append(uuid)
 
 
 def _teardown_test_simulation(uuid, settings):

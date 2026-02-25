@@ -157,8 +157,8 @@ class SimulationFileView(LoginRequiredMixin, View):
         # (catches symlink escapes and any edge cases not caught above)
         try:
             file_path.relative_to(base_dir)
-        except ValueError:
-            raise Http404
+        except ValueError as exc:
+            raise Http404 from exc
 
         if not file_path.is_file():
             raise Http404
@@ -167,8 +167,8 @@ class SimulationFileView(LoginRequiredMixin, View):
         uuid_str = file_path.stem
         try:
             simulation = LeewaySimulation.objects.get(uuid=uuid_str)
-        except (LeewaySimulation.DoesNotExist, ValueError):
-            raise Http404
+        except (LeewaySimulation.DoesNotExist, ValueError) as exc:
+            raise Http404 from exc
 
         if simulation.user != request.user:
             return HttpResponseForbidden(
