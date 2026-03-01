@@ -338,6 +338,16 @@ table.tg tr:hover td {
   background: #eaf4fb;
 }
 
+/* ── Truncated text with tooltip ───────────────────────────────── */
+.truncate {
+  display: inline-block;
+  max-width: 20ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
 /* ── Detail view ───────────────────────────────────────────────── */
 .error-label {
   font-weight: 700;
