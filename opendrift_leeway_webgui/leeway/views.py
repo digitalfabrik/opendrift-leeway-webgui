@@ -2,7 +2,7 @@ import mimetypes
 from pathlib import Path
 
 from django.conf import settings
-from django.contrib import messages
+from django.contrib import auth, messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import FileResponse, Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
@@ -12,8 +12,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.list import ListView
 
-from .forms import LeewaySimulationForm
-from .models import LeewaySimulation
+from .forms import LeewaySimulationForm, RegistrationForm
+from .models import InvitationToken, LeewaySimulation
 from .tasks import run_leeway_simulation
 
 
@@ -121,6 +121,57 @@ class LeewaySimulationDeleteView(LoginRequiredMixin, DeleteView):
         Only return simulations of the current user to prevent deleting other users' simulations
         """
         return super().get_queryset().filter(user=self.request.user)
+
+
+class RegistrationView(CreateView):
+    """
+    Public registration form for new users arriving via an invitation token link.
+
+    The token is embedded in the URL. If it does not exist or has already been
+    used, a 404 is raised. On successful registration the token is consumed and
+    the new user is logged in automatically.
+    """
+
+    #: The form class for user creation
+    form_class = RegistrationForm
+
+    #: Template rendered for GET and invalid POST
+    template_name = "registration/register.html"
+
+    def _get_unused_token(self):
+        """
+        Return the unused :class:`~.models.InvitationToken` for the URL kwarg, or raise 404.
+        """
+        token = InvitationToken.objects.filter(
+            token=self.kwargs["token"], used_by__isnull=True
+        ).first()
+        if token is None:
+            raise Http404
+        return token
+
+    def get(self, request, *args, **kwargs):
+        """
+        Render the registration form, or 404 if the token is invalid/used.
+        """
+        self._get_unused_token()
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        """
+        Save the new user, consume the token, and log the user in.
+        """
+        invitation = self._get_unused_token()
+        user = form.save()
+        invitation.used_by = user
+        invitation.save()
+        auth.login(self.request, user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """
+        Redirect to the simulation form after successful registration.
+        """
+        return reverse_lazy("simulation_form")
 
 
 class SimulationFileView(LoginRequiredMixin, View):

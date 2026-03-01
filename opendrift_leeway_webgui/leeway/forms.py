@@ -2,6 +2,8 @@
 Forms for the web GUI
 """
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 from django.forms import CharField, ModelForm, TextInput
 
 from .models import LeewaySimulation
@@ -58,3 +60,26 @@ class LeewaySimulationForm(ModelForm):
         Convert latitude DMS to decimal
         """
         return normalize_dms2dec(self.cleaned_data.get("latitude", ""))
+
+
+# pylint: disable=too-many-ancestors
+class RegistrationForm(UserCreationForm):
+    """
+    Registration form for new users arriving via an invitation token link.
+    Collects username, first name, last name, email address, and password.
+    """
+
+    class Meta:
+        """
+        Configure form fields.
+        """
+
+        model = get_user_model()
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password1",
+            "password2",
+        ]

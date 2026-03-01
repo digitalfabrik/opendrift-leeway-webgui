@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
 from .utils import LEEWAY_OBJECT_TYPES
@@ -59,6 +60,48 @@ class LeewaySimulation(models.Model):
     def __str__(self):
         # pylint: disable=no-member
         return f"{self.name or self.uuid} {self.user.email}"
+
+    class Meta:
+        app_label = "leeway"
+
+
+class InvitationToken(models.Model):
+    """
+    A single-use invitation token that grants access to the registration form.
+    Tokens are automatically generated 32-character alphanumeric strings.
+    """
+
+    #: The token value — auto-generated, never editable
+    token = models.CharField(max_length=32, unique=True, editable=False)
+
+    #: When this token was created
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    #: The user who registered with this token, or null if unused
+    used_by = models.OneToOneField(
+        get_user_model(),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="invitation_token",
+        verbose_name=_("Used by"),
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = get_random_string(32)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_used(self):
+        """
+        Whether this token has already been consumed by a registration.
+        """
+        return self.used_by_id is not None
+
+    def __str__(self):
+        status = "used" if self.is_used else "unused"
+        return f"{self.token} ({status})"
 
     class Meta:
         app_label = "leeway"

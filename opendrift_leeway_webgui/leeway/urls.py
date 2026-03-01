@@ -14,6 +14,7 @@ from .views import (
     LeewaySimulationDetailView,
     LeewaySimulationDocumentation,
     LeewaySimulationListView,
+    RegistrationView,
     SimulationFileView,
 )
 
@@ -53,5 +54,6 @@ urlpatterns += [
         "simulation-files/<path:path>",
         SimulationFileView.as_view(),
         name="simulation_file",
-    )
+    ),
+    path("accounts/register/<str:token>/", RegistrationView.as_view(), name="register"),
 ]
