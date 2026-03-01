@@ -4,6 +4,7 @@ import subprocess
 from datetime import timedelta
 from pathlib import Path
 
+import requests as http_requests
 from django.apps import apps
 from django.conf import settings
 from django.utils import timezone
@@ -92,6 +93,39 @@ def run_leeway_simulation(request_id):
         simulation.netcdf.name = netcdf_filename
     simulation.save()
     send_result_mail(simulation)
+    # Dispatch a webhook delivery task for each of the user's configured webhooks
+    for webhook in simulation.user.webhooks.all():
+        deliver_webhook.apply_async([webhook.pk, str(simulation.uuid)])
+
+
+@app.task(bind=True, max_retries=3, default_retry_delay=60)
+def deliver_webhook(self, webhook_id, simulation_uuid):
+    """
+    POST the simulation UUID to a user-configured webhook URL.
+    Retries up to 5 times with a 60-second delay on any failure.
+    """
+    # pylint: disable=invalid-name
+    Webhook = apps.get_model(app_label="leeway", model_name="Webhook")
+    webhook = Webhook.objects.get(pk=webhook_id)
+    try:
+        response = http_requests.post(
+            webhook.url, json={"uuid": simulation_uuid}, timeout=10
+        )
+        response.raise_for_status()
+        logger.info(
+            "Webhook %s delivered for simulation %s (HTTP %s)",
+            webhook.url,
+            simulation_uuid,
+            response.status_code,
+        )
+    except Exception as exc:  # pylint: disable=broad-exception-caught
+        logger.warning(
+            "Webhook %s failed for simulation %s: %s — retrying",
+            webhook.url,
+            simulation_uuid,
+            exc,
+        )
+        self.retry(exc=exc)
 
 
 @app.task
