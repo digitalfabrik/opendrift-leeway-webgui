@@ -26,6 +26,7 @@ class LeewaySimulation(models.Model):
     """
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255, blank=True, verbose_name=_("Name"))
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     longitude = models.FloatField()
     latitude = models.FloatField()
@@ -57,7 +58,7 @@ class LeewaySimulation(models.Model):
 
     def __str__(self):
         # pylint: disable=no-member
-        return f"{self.uuid} {self.user.email}"
+        return f"{self.name or self.uuid} {self.user.email}"
 
     class Meta:
         app_label = "leeway"

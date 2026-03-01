@@ -3,7 +3,7 @@
     <h2>List of Leeway Simulations</h2>
     <table class="data-table">
         <tr>
-            <th>ID</th>
+            <th>Name</th>
             <th>Longitude</th>
             <th>Latitude</th>
             <th>Start Time</th>
@@ -13,7 +13,7 @@
         </tr>
         {% for simulation in simulations %}
             <tr>
-                <td>{{ simulation.uuid }}</td>
+                <td>{{ simulation.name|default:simulation.uuid }}</td>
                 <td>{{ simulation.longitude|floatformat:4 }}</td>
                 <td>{{ simulation.latitude|floatformat:4 }}</td>
                 <td>{{ simulation.start_time }}</td>
