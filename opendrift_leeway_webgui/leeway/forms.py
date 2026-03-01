@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import CharField, ModelForm, TextInput
 
-from .models import LeewaySimulation
+from .models import LeewaySimulation, Webhook
 from .utils import normalize_dms2dec
 
 
@@ -60,6 +60,20 @@ class LeewaySimulationForm(ModelForm):
         Convert latitude DMS to decimal
         """
         return normalize_dms2dec(self.cleaned_data.get("latitude", ""))
+
+
+class WebhookForm(ModelForm):
+    """
+    Form for creating a new webhook.
+    """
+
+    class Meta:
+        """
+        Configure form fields.
+        """
+
+        model = Webhook
+        fields = ["url"]
 
 
 # pylint: disable=too-many-ancestors

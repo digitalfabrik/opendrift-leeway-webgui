@@ -20,7 +20,6 @@ def simulation_storage():
     )
 
 
-# Create your models here.
 class LeewaySimulation(models.Model):
     """
     Required information for simulation run
@@ -71,13 +70,8 @@ class InvitationToken(models.Model):
     Tokens are automatically generated 32-character alphanumeric strings.
     """
 
-    #: The token value — auto-generated, never editable
     token = models.CharField(max_length=32, unique=True, editable=False)
-
-    #: When this token was created
     created_at = models.DateTimeField(auto_now_add=True)
-
-    #: The user who registered with this token, or null if unused
     used_by = models.OneToOneField(
         get_user_model(),
         null=True,
@@ -102,6 +96,28 @@ class InvitationToken(models.Model):
     def __str__(self):
         status = "used" if self.is_used else "unused"
         return f"{self.token} ({status})"
+
+    class Meta:
+        app_label = "leeway"
+
+
+class Webhook(models.Model):
+    """
+    A webhook URL belonging to a user that is called with a POST request
+    containing the simulation UUID when one of their simulations finishes.
+    """
+
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="webhooks",
+        verbose_name=_("User"),
+    )
+    url = models.URLField(verbose_name=_("URL"))
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.url} ({self.user})"
 
     class Meta:
         app_label = "leeway"

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Webhooks</h2>
+    <p>
+        Webhooks are called with a <code>POST</code> request containing
+        <code>{"uuid": "…"}</code> when one of your simulations finishes.
+    </p>
+    {% if webhooks %}
+        <table class="data-table">
+            <tr>
+                <th>URL</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+            {% for webhook in webhooks %}
+                <tr>
+                    <td>{{ webhook.url }}</td>
+                    <td>{{ webhook.created_at }}</td>
+                    <td>
+                        <form method="post" action="{% url 'webhook_test' pk=webhook.pk %}">
+                            {% csrf_token %}
+                            <button type="submit">Send test</button>
+                        </form>
+                        <a href="{% url 'webhook_delete' pk=webhook.pk %}">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No webhooks configured yet.</p>
+    {% endif %}
+    <h3>Add webhook</h3>
+    <form method="post" action="{% url 'webhook_create' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add</button>
+    </form>
+{% endblock content %}

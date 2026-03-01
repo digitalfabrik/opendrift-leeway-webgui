@@ -16,6 +16,10 @@ from .views import (
     LeewaySimulationListView,
     RegistrationView,
     SimulationFileView,
+    WebhookCreateView,
+    WebhookDeleteView,
+    WebhookListView,
+    WebhookTestView,
 )
 
 #: The url patterns of this module (see :doc:`django:topics/http/urls`)
@@ -56,4 +60,17 @@ urlpatterns += [
         name="simulation_file",
     ),
     path("accounts/register/<str:token>/", RegistrationView.as_view(), name="register"),
+    path(
+        "webhooks/",
+        include(
+            [
+                path("", WebhookListView.as_view(), name="webhook_list"),
+                path("add/", WebhookCreateView.as_view(), name="webhook_create"),
+                path(
+                    "<pk>/delete/", WebhookDeleteView.as_view(), name="webhook_delete"
+                ),
+                path("<pk>/test/", WebhookTestView.as_view(), name="webhook_test"),
+            ]
+        ),
+    ),
 ]

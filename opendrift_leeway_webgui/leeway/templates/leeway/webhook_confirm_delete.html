@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Delete Webhook</h2>
+    <p>
+        Are you sure you want to delete the webhook for <strong>{{ object.url }}</strong>? This action cannot be undone.
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Delete</button>
+        <a href="{% url 'webhook_list' %}">Cancel</a>
+    </form>
+{% endblock content %}
