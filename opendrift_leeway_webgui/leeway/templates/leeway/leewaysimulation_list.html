@@ -4,6 +4,7 @@
     <table class="data-table">
         <tr>
             <th>Name</th>
+            <th>Object Type</th>
             <th>Longitude</th>
             <th>Latitude</th>
             <th>Start Time</th>
@@ -14,6 +15,9 @@
         {% for simulation in simulations %}
             <tr>
                 <td>{{ simulation.name|default:simulation.uuid }}</td>
+                <td>
+                    <span class="truncate" title="{{ simulation.get_object_type_display }}">{{ simulation.get_object_type_display }}</span>
+                </td>
                 <td>{{ simulation.longitude|floatformat:4 }}</td>
                 <td>{{ simulation.latitude|floatformat:4 }}</td>
                 <td>{{ simulation.start_time }}</td>
