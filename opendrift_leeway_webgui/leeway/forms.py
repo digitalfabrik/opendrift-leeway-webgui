@@ -30,6 +30,7 @@ class LeewaySimulationForm(ModelForm):
 
         model = LeewaySimulation
         fields = [
+            "name",
             "latitude",
             "longitude",
             "object_type",
