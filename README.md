@@ -30,7 +30,7 @@ Authentication can be provided in two ways:
 
 # Installation
 
-**Prerequisite:** _Python 3.8 or later is required._
+**Prerequisite:** _Python 3.13 or later is required._
 
 1. Clone this repository and change into the new directory:
    ```bash
