@@ -6,9 +6,9 @@
 
 # About
 
-This is a little Django web application that does an [OpenDrift](https://github.com/OpenDrift/opendrift) [Leeway](https://opendrift.github.io/choosing_a_model.html) simulation with a set of provided parameters via a web form. The result is sent to a user via e-mail.
+This projects provides a web service for [OpenDrift](https://github.com/OpenDrift/opendrift) [Leeway](https://opendrift.github.io/choosing_a_model.html) simulations. The goal is to support Search and Rescue operations with drift simulations of persons in water and boats based on sea currents and wind. Simulations can be managed with a web interface or REST API. E-mail can be used to start simulations and receive the result in low bandwidth environments. It is also possible to integrate the service into other tools via the API and webhooks for finished simulations. The results are provided as images (map) and GeoJSON (particle drift trajectories).
 
-This is an experimental tool to help Search and Rescue operations. An experimental service is available at [leeway.tuerantuer.org](https://leeway.tuerantuer.org).
+It is possible to use the service at [leeway.tuerantuer.org](https://leeway.tuerantuer.org).
 
 Sample output from the leeway tool (100 points, 1km radius, south of Lampedusa):
 
