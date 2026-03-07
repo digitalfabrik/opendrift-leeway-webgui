@@ -294,10 +294,10 @@ def main():
     yloc = ticker.FixedLocator(y_ticks)
 
     longitude_formatter = gridliner.LongitudeFormatter(
-        dms=True, auto_hide=False, number_format=".0f"
+        dms=True, auto_hide=False, number_format=".0f", seconds_number_format=".0f"
     )
     latitude_formatter = gridliner.LatitudeFormatter(
-        dms=True, auto_hide=False, number_format=".0f"
+        dms=True, auto_hide=False, number_format=".0f", seconds_number_format=".0f"
     )
 
     gl = ax.gridlines(
