@@ -24,7 +24,7 @@ def test_simulation(admin_client, settings, celery_worker, uuid_store):
             "latitude": "33°58'44.3\"",
             "longitude": "11°21'13.4\"",
             "object_type": 27,
-            "start_time": (datetime.now() - timedelta(hours=12)).strftime(
+            "start_time": (datetime.now() - timedelta(hours=36)).strftime(
                 "%Y-%m-%d %H:%M"
             ),
             "duration": 2,
