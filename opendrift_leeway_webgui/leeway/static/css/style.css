@@ -348,6 +348,26 @@ table.tg tr:hover td {
   vertical-align: bottom;
 }
 
+/* ── Coordinate DMS input group ────────────────────────────────── */
+.coord-group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+}
+
+.coord-group input[type="text"] {
+  width: 5rem;
+}
+
+.coord-group select {
+  width: auto;
+}
+
+.coord-symbol {
+  flex-shrink: 0;
+}
+
 /* ── Detail view ───────────────────────────────────────────────── */
 .error-label {
   font-weight: 700;
