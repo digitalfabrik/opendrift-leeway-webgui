@@ -5,8 +5,125 @@
     <form method="post">
         {% csrf_token %}
         <table>
-            {{ form.as_table }}
+            {{ form.name.errors }}
+            <tr>
+                <th>
+                    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
+                </th>
+                <td>
+                    {{ form.name }}
+                    {% if form.name.help_text %}<span class="helptext">{{ form.name.help_text }}</span>{% endif %}
+                </td>
+            </tr>
+            {{ form.latitude.errors }}
+            {{ form.latitude_deg.errors }}
+            {{ form.latitude_min.errors }}
+            {{ form.latitude_sec.errors }}
+            {{ form.latitude_dir.errors }}
+            <tr>
+                <th>
+                    <label>Latitude:</label>
+                </th>
+                <td>
+                    <span class="coord-group">
+                        {{ form.latitude_deg }}<span class="coord-symbol">°</span>
+                        {{ form.latitude_min }}<span class="coord-symbol">′</span>
+                        {{ form.latitude_sec }}<span class="coord-symbol">″</span>
+                        {{ form.latitude_dir }}
+                    </span>
+                    <span class="helptext">(N/S) Degrees, minutes, seconds. Decimals in degrees override minutes and seconds; decimals in minutes override seconds.</span>
+                </td>
+            </tr>
+            {{ form.longitude.errors }}
+            {{ form.longitude_deg.errors }}
+            {{ form.longitude_min.errors }}
+            {{ form.longitude_sec.errors }}
+            {{ form.longitude_dir.errors }}
+            <tr>
+                <th>
+                    <label>Longitude:</label>
+                </th>
+                <td>
+                    <span class="coord-group">
+                        {{ form.longitude_deg }}<span class="coord-symbol">°</span>
+                        {{ form.longitude_min }}<span class="coord-symbol">′</span>
+                        {{ form.longitude_sec }}<span class="coord-symbol">″</span>
+                        {{ form.longitude_dir }}
+                    </span>
+                    <span class="helptext">(E/W) Degrees, minutes, seconds. Decimals in degrees override minutes and seconds; decimals in minutes override seconds.</span>
+                </td>
+            </tr>
+            {{ form.object_type.errors }}
+            <tr>
+                <th>
+                    <label for="{{ form.object_type.id_for_label }}">{{ form.object_type.label }}:</label>
+                </th>
+                <td>
+                    {{ form.object_type }}
+                    {% if form.object_type.help_text %}<span class="helptext">{{ form.object_type.help_text }}</span>{% endif %}
+                </td>
+            </tr>
+            {{ form.start_time.errors }}
+            <tr>
+                <th>
+                    <label for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}:</label>
+                </th>
+                <td>
+                    {{ form.start_time }}
+                    {% if form.start_time.help_text %}<span class="helptext">{{ form.start_time.help_text }}</span>{% endif %}
+                </td>
+            </tr>
+            {{ form.duration.errors }}
+            <tr>
+                <th>
+                    <label for="{{ form.duration.id_for_label }}">{{ form.duration.label }}:</label>
+                </th>
+                <td>
+                    {{ form.duration }}
+                    {% if form.duration.help_text %}<span class="helptext">{{ form.duration.help_text }}</span>{% endif %}
+                </td>
+            </tr>
+            {{ form.radius.errors }}
+            <tr>
+                <th>
+                    <label for="{{ form.radius.id_for_label }}">{{ form.radius.label }}:</label>
+                </th>
+                <td>
+                    {{ form.radius }}
+                    {% if form.radius.help_text %}<span class="helptext">{{ form.radius.help_text }}</span>{% endif %}
+                </td>
+            </tr>
         </table>
         <button type="submit">Simulate</button>
     </form>
+    <script>
+        function hasDecimal(input) {
+            return input.value.includes('.');
+        }
+
+        function setDisabled(input, disabled) {
+            input.disabled = disabled;
+            input.style.opacity = disabled ? '0.4' : '';
+        }
+
+        function updateCoord(degInput, minInput, secInput) {
+            var degDecimal = hasDecimal(degInput);
+            var minDecimal = hasDecimal(minInput);
+            setDisabled(minInput, degDecimal);
+            setDisabled(secInput, degDecimal || minDecimal);
+        }
+
+        function initCoord(degId, minId, secId) {
+            var deg = document.getElementById(degId);
+            var min = document.getElementById(minId);
+            var sec = document.getElementById(secId);
+            function update() { updateCoord(deg, min, sec); }
+            deg.addEventListener('input', update);
+            min.addEventListener('input', update);
+            update();
+        }
+
+        initCoord('{{ form.latitude_deg.auto_id }}', '{{ form.latitude_min.auto_id }}', '{{ form.latitude_sec.auto_id }}');
+        initCoord('{{ form.longitude_deg.auto_id }}', '{{ form.longitude_min.auto_id }}', '{{ form.longitude_sec.auto_id }}');
+    </script>
 {% endblock content %}
