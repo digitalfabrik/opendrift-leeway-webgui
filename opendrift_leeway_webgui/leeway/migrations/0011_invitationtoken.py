@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("leeway", "0010_leewaysimulation_name"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

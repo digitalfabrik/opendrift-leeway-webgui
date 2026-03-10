@@ -15,9 +15,7 @@ def simulation_storage():
     """
     Callable to get the simulation storage
     """
-    return FileSystemStorage(
-        location=settings.SIMULATION_OUTPUT, base_url=settings.SIMULATION_URL
-    )
+    return FileSystemStorage(location=settings.SIMULATION_OUTPUT, base_url=settings.SIMULATION_URL)
 
 
 class LeewaySimulation(models.Model):
@@ -36,12 +34,8 @@ class LeewaySimulation(models.Model):
     simulation_started = models.DateTimeField(null=True)
     simulation_finished = models.DateTimeField(null=True)
     radius = models.IntegerField(default=1000)
-    img = models.FileField(
-        null=True, storage=simulation_storage, verbose_name=_("Image file")
-    )
-    netcdf = models.FileField(
-        null=True, storage=simulation_storage, verbose_name=_("NetCDF file")
-    )
+    img = models.FileField(null=True, storage=simulation_storage, verbose_name=_("Image file"))
+    netcdf = models.FileField(null=True, storage=simulation_storage, verbose_name=_("NetCDF file"))
     geojson = models.FileField(
         null=True,
         storage=simulation_storage,
@@ -121,3 +115,13 @@ class Webhook(models.Model):
 
     class Meta:
         app_label = "leeway"
+
+
+class IconFiles(models.Model):
+    """
+    A model to store file names of the last downloads of the ICON-EU model
+    """
+
+    frt = models.CharField(max_length=2, verbose_name=_("Forecast time"))
+    file_name = models.CharField(max_length=127, verbose_name=_("File name of downloaded file"))
+    download_date = models.DateTimeField(auto_now_add=True)

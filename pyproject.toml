@@ -18,16 +18,21 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
+    "cfgrib",
     "celery",
+    "dask",
     "django>=4.1",
     "djangorestframework",
     "django-rest-knox",
     "dms2dec",
     "drf-spectacular",
+    "netCDF4",
+    "numpy",
     "redis",
     "requests",
     "uvicorn",
     "gunicorn",
+    "xarray",
 ]
 
 [project.urls]
@@ -39,14 +44,12 @@ dependencies = [
 dev = [
     "bumpver",
     "pre-commit",
-    "numpy",
     "matplotlib",
-    "pylint",
-    "pylint-django",
     "pytest",
     "pytest-cov",
     "pytest-django",
     "pytest-env",
+    "ruff",
 ]
 
 [tool.setuptools.packages.find]
@@ -58,8 +61,16 @@ opendrift_leeway_webgui = [
     "**/static/**/*",
 ]
 
-[tool.black]
-    skip-magic-trailing-comma = true
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "C90"]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["opendrift_leeway_webgui"]
 
 [tool.bumpver]
 current_version = "2024.1.0"
@@ -77,36 +88,6 @@ push = true
 
 [tool.djlint]
 profile="django"
-
-[tool.isort]
-known_first_party = "opendrift_leeway_webgui"
-include_trailing_comma = true
-line_length            = 88
-multi_line_output      = 3
-
-[tool.pylint.main]
-jobs = 0
-load-plugins = [
-    "pylint_django",
-    "pylint.extensions.comparison_placement",
-    "pylint.extensions.for_any_all",
-    "pylint.extensions.consider_ternary_expression",
-]
-django-settings-module="opendrift_leeway_webgui.core.settings"
-ignore-paths = ["^.*/migrations/.*$"]
-
-[tool.pylint.messages_control]
-disable = [
-  "missing-module-docstring",
-  "duplicate-code",
-]
-enable = ["useless-suppression"]
-
-[tool.pylint.format]
-max-line-length = 120
-
-[tool.pylint.reports]
-output-format = "colorized"
 
 [tool.pytest.ini_options]
 addopts = [

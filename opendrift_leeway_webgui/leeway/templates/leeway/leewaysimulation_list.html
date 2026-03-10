@@ -25,7 +25,7 @@
                 <td>{{ simulation.radius }}</td>
                 <td>
                     {% if simulation.error %}
-                        <a href="{% url "simulation_detail" pk=simulation.pk %}">Error</a>
+                        <a href="{% url "simulation_detail" pk=simulation.pk %}">Details</a>
                     {% endif %}
                     {% if simulation.img %}<a href="{{ simulation.img.url }}">Image</a>{% endif %}
                     {% if simulation.geojson %}<a href="{{ simulation.geojson.url }}">GeoJSON</a>{% endif %}

@@ -3,10 +3,21 @@ Utilities
 """
 
 # pylint: disable=cyclic-import
+import bz2
+import os
+import re
+import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta
+from pathlib import Path
 
+import numpy as np
+import requests
+import xarray as xr
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMessage, send_mail  #
 from dms2dec.dms_convert import dms2dec
 
 # https://github.com/OpenDrift/opendrift/blob/master/opendrift/models/OBJECTPROP.DAT
@@ -170,11 +181,7 @@ def mail_result_text(simulation):
     """
     Create a result mail text
     """
-    text = (
-        "Find the image attached."
-        if simulation.img
-        else f"The simulation failed:\n\n{simulation.error}"
-    )
+    text = "Find the image attached." if simulation.img else f"The simulation failed:\n\n{simulation.error}"
     return (
         f"Your request with ID {simulation.uuid} has been processed. {text}\n\n"
         "Simulation parameters:\n"
@@ -237,3 +244,228 @@ def normalize_dms2dec(data):
     if "°" in data:
         return dms2dec(data)
     return data
+
+
+### Download ICON EU wind data for opendrift
+
+
+def _list_bz2_files(url: str) -> list[str]:
+    """Fetch the DWD directory listing and return all sorted .bz2 filenames."""
+    resp = requests.get(url, timeout=30)
+    resp.raise_for_status()
+    files = re.findall(r'href="([^"]+\.bz2)"', resp.text)
+    return sorted(set(files))
+
+
+def _download_and_decompress(url: str, dest_path: Path) -> Path:
+    """Download a .bz2 file, decompress it in-memory, write GRIB2 to *dest_path*.
+
+    Returns *dest_path* on success so futures can report it easily.
+    Raises on any HTTP or decompression error.
+    """
+    resp = requests.get(url, timeout=120, stream=True)
+    resp.raise_for_status()
+    dest_path.write_bytes(bz2.decompress(resp.content))
+    return dest_path
+
+
+def _parallel_download(tasks: list[tuple[str, Path]], max_workers: int) -> list[Path]:
+    """Download and decompress *tasks* = [(url, dest_path), …] in parallel.
+
+    Uses a ThreadPoolExecutor with MAX_WORKERS threads. Progress is printed
+    as each file completes (thread-safe). Returns a sorted list of paths.
+    Raises RuntimeError if any download fails.
+    """
+    completed = 0
+    results: list[Path] = []
+    errors: list[str] = []
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_url = {executor.submit(_download_and_decompress, url, dest): url for url, dest in tasks}
+
+        for future in as_completed(future_to_url):
+            url = future_to_url[future]
+            fname = url.split("/")[-1]
+            try:
+                path = future.result()
+                results.append(path)
+                completed += 1
+            except Exception:
+                errors.append(fname)
+
+    if errors:
+        raise RuntimeError(f"{len(errors)} download(s) failed:\n  " + "\n  ".join(errors))
+
+    return sorted(results)
+
+
+def _rename_for_opendrift(ds: xr.Dataset) -> xr.Dataset:
+    """Rename variables/coordinates so OpenDrift's GenericModelReader
+    can auto-detect them.
+
+    OpenDrift expects:
+        x_wind / y_wind  (CF standard_name)
+        longitude / latitude
+        time
+    """
+
+    # CF standard_name attributes
+
+    ds = ds.rename({"valid_time": "time"})
+
+    ds["u10"].attrs.update(
+        {
+            "standard_name": "x_wind",
+            "units": "m s-1",
+            "long_name": "10 metre U wind component",
+        }
+    )
+
+    ds["v10"].attrs.update(
+        {
+            "standard_name": "y_wind",
+            "units": "m s-1",
+            "long_name": "10 metre V wind component",
+        }
+    )
+
+    ds.attrs.update(
+        {
+            "Conventions": "CF-1.7",
+            "title": "ICON-EU 10 m wind – DWD OpenData",
+            "source": "https://opendata.dwd.de/weather/nwp/icon-eu/",
+        }
+    )
+
+    return ds
+
+
+def _merge_netCDF(big_file: str, new_ds, cutoff_hours=None):
+    big_ds = xr.open_dataset(big_file)
+
+    # Remove overlapping times from big_ds
+    ds1_no_overlap = big_ds.sel(time=~big_ds.time.isin(new_ds.time))
+
+    # Concatenate along time
+    big_ds = xr.concat([ds1_no_overlap, new_ds], dim="time")
+    big_ds = big_ds.sortby("time")
+
+    now = np.datetime64("now")
+    cutoff_time = now - np.timedelta64(cutoff_hours, "h")
+
+    big_ds = big_ds.sel(time=big_ds.time >= cutoff_time)
+    big_ds.to_netcdf(f"{big_file}.PART")
+    os.remove(big_file)
+    os.rename(f"{big_file}.PART", big_file)
+
+
+def download_and_merge(
+    frt,
+    max_workers=None,
+    output_file=None,
+    cutoff_hours=120,
+):
+    """
+    1. Download ICON-EU 10 m wind data (U/V components) from DWD OpenData
+    2. Unpack bz2 GRIB2 files in parallel
+    3. merge u and v component
+    4. make compatible with OpenDrift's GenericModelReader.
+    5. merge into a single NetCDF file, keep everything until cutoff_hours
+
+    Parameters:
+        frt: str
+            Forecast time of the ICON-EU model run. [00, 03, 06, 09, 12, 15, 18, 21]
+        max_workers: int
+            Number of parallel download workers
+        output_file: str
+            Existing netCDF file
+        cutoff_hours: int
+            Data that is older than cutoff_hours will be deleted
+    Returns:
+        xr.Dataset
+            The merged NetCDF file
+    """
+    if max_workers is None:
+        max_workers = settings.ICON_MAX_WORKERS
+    if output_file is None:
+        output_file = settings.ICON_DATA_PATH
+    if frt not in ["00", "03", "06", "09", "12", "15", "18", "21"]:
+        raise ValueError(f"Invalid frt: {frt}")
+
+    IconFiles = apps.get_model(app_label="leeway", model_name="IconFiles")
+    last_downloads = IconFiles.objects.filter(frt=frt).values_list("file_name", flat=True)
+
+    BASE_URL_U = f"https://opendata.dwd.de/weather/nwp/icon-eu/grib/{frt}/u_10m/"
+    BASE_URL_V = f"https://opendata.dwd.de/weather/nwp/icon-eu/grib/{frt}/v_10m/"
+
+    # Download and merge U and V components
+    print("Listing available files …")
+    u_files = _list_bz2_files(BASE_URL_U)
+    v_files = _list_bz2_files(BASE_URL_V)
+
+    if u_files is None or v_files is None:
+        print("No files found.")
+        return None
+
+    if sorted([*u_files, *v_files]) == sorted(last_downloads):
+        print(f"{frt} already downloaded.")
+        return None
+
+    print(f"  U files: {len(u_files)}   V files: {len(v_files)}")
+    print(f"\nDownloading in parallel with {max_workers} workers")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+
+        # Build task lists: (url, destination_path)
+        u_tasks = [(BASE_URL_U + f, tmp / f.replace(".bz2", "")) for f in u_files]
+        v_tasks = [(BASE_URL_V + f, tmp / f.replace(".bz2", "")) for f in v_files]
+
+        u_gribs = _parallel_download(u_tasks, max_workers=max_workers)
+        v_gribs = _parallel_download(v_tasks, max_workers=max_workers)
+
+        print("\nLoading GRIB2 files into xarray …")
+        ds_u = xr.open_mfdataset(
+            u_gribs,
+            engine="cfgrib",
+            combine="nested",
+            concat_dim="valid_time",
+            coords="different",
+            compat="no_conflicts",
+            join="outer",
+            parallel=True,
+            backend_kwargs={"errors": "ignore"},
+        )
+        ds_v = xr.open_mfdataset(
+            v_gribs,
+            engine="cfgrib",
+            combine="nested",
+            concat_dim="valid_time",
+            coords="different",
+            compat="no_conflicts",
+            join="outer",
+            parallel=True,
+            backend_kwargs={"errors": "ignore"},
+        )
+
+        # Drop scalar coords that differ between timesteps to avoid merge conflicts
+        keep = {"valid_time", "latitude", "longitude"}
+        ds_u = ds_u.drop_vars([c for c in ds_u.coords if c not in keep], errors="ignore")
+        ds_v = ds_v.drop_vars([c for c in ds_v.coords if c not in keep], errors="ignore")
+
+        ds = xr.merge([ds_u, ds_v], join="outer")
+
+        print("\nRenaming variables for OpenDrift compatibility …")
+        ds = _rename_for_opendrift(ds)
+
+        if output_file:
+            if os.path.exists(output_file):
+                _merge_netCDF(output_file, ds, cutoff_hours)
+            else:
+                ds.to_netcdf(output_file)
+        for f in u_files:
+            IconFiles(frt=frt, file_name=f, download_date=datetime.now()).save()
+        for f in v_files:
+            IconFiles(frt=frt, file_name=f, download_date=datetime.now()).save()
+        IconFiles.objects.filter(download_date__lt=datetime.now() - timedelta(hours=23)).delete()
+    return ds

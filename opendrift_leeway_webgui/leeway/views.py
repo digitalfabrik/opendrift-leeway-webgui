@@ -52,9 +52,7 @@ class LeewaySimulationCreateView(LoginRequiredMixin, CreateView):
         """
         When the form is invalid, show an error message
         """
-        messages.error(
-            self.request, ("An error occurred. Simulation could not be started.")
-        )
+        messages.error(self.request, ("An error occurred. Simulation could not be started."))
         return super().form_invalid(form)
 
     def form_valid(self, form):
@@ -128,9 +126,7 @@ class RegistrationView(CreateView):
         """
         Return the unused :class:`~.models.InvitationToken` for the URL kwarg, or raise 404.
         """
-        token = InvitationToken.objects.filter(
-            token=self.kwargs["token"], used_by__isnull=True
-        ).first()
+        token = InvitationToken.objects.filter(token=self.kwargs["token"], used_by__isnull=True).first()
         if token is None:
             raise Http404
         return token
@@ -204,9 +200,7 @@ class WebhookCreateView(LoginRequiredMixin, CreateView):
         On invalid input re-render the list page with errors.
         """
         webhooks = Webhook.objects.filter(user=self.request.user)
-        return self.render_to_response(
-            self.get_context_data(form=form, webhooks=webhooks)
-        )
+        return self.render_to_response(self.get_context_data(form=form, webhooks=webhooks))
 
     def get_template_names(self):
         return ["leeway/webhook_list.html"]
@@ -287,9 +281,7 @@ class SimulationFileView(LoginRequiredMixin, View):
             raise Http404 from exc
 
         if simulation.user != request.user:
-            return HttpResponseForbidden(
-                "You do not have permission to access this file."
-            )
+            return HttpResponseForbidden("You do not have permission to access this file.")
 
         content_type, _ = mimetypes.guess_type(str(file_path))
         return FileResponse(

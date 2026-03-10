@@ -35,9 +35,7 @@ urlpatterns = [
         include(
             [
                 path("", LeewaySimulationListView.as_view(), name="simulation_list"),
-                path(
-                    "new/", LeewaySimulationCreateView.as_view(), name="simulation_form"
-                ),
+                path("new/", LeewaySimulationCreateView.as_view(), name="simulation_form"),
                 path(
                     "<pk>/",
                     LeewaySimulationDetailView.as_view(),
@@ -66,9 +64,7 @@ urlpatterns += [
             [
                 path("", WebhookListView.as_view(), name="webhook_list"),
                 path("add/", WebhookCreateView.as_view(), name="webhook_create"),
-                path(
-                    "<pk>/delete/", WebhookDeleteView.as_view(), name="webhook_delete"
-                ),
+                path("<pk>/delete/", WebhookDeleteView.as_view(), name="webhook_delete"),
                 path("<pk>/test/", WebhookTestView.as_view(), name="webhook_test"),
             ]
         ),

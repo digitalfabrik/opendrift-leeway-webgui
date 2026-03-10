@@ -1,21 +1,20 @@
 import logging
 import os
 import subprocess
-from datetime import timedelta
 from pathlib import Path
 
 import requests as http_requests
+from celery import shared_task
 from django.apps import apps
 from django.conf import settings
 from django.utils import timezone
 
-from .celery import app
-from .utils import send_result_mail
+from .utils import download_and_merge, send_result_mail
 
 logger = logging.getLogger(__name__)
 
 
-@app.task
+@shared_task
 def run_leeway_simulation(request_id):
     """
     Get parameters for simulation from database and kick off the simulation
@@ -67,9 +66,7 @@ def run_leeway_simulation(request_id):
         "--id",
         str(simulation.uuid),
     ]
-    with subprocess.Popen(
-        params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
-    ) as sim_proc:
+    with subprocess.Popen(params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True) as sim_proc:
         stdout, stderr = sim_proc.communicate()
     logger.info("Output from simulation %s: %s", simulation.uuid, stdout)
     if stderr:
@@ -98,7 +95,7 @@ def run_leeway_simulation(request_id):
         deliver_webhook.apply_async([webhook.pk, str(simulation.uuid)])
 
 
-@app.task(bind=True, max_retries=3, default_retry_delay=60)
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def deliver_webhook(self, webhook_id, simulation_uuid):
     """
     POST the simulation UUID to a user-configured webhook URL.
@@ -108,9 +105,7 @@ def deliver_webhook(self, webhook_id, simulation_uuid):
     Webhook = apps.get_model(app_label="leeway", model_name="Webhook")
     webhook = Webhook.objects.get(pk=webhook_id)
     try:
-        response = http_requests.post(
-            webhook.url, json={"uuid": simulation_uuid}, timeout=10
-        )
+        response = http_requests.post(webhook.url, json={"uuid": simulation_uuid}, timeout=10)
         response.raise_for_status()
         logger.info(
             "Webhook %s delivered for simulation %s (HTTP %s)",
@@ -128,18 +123,12 @@ def deliver_webhook(self, webhook_id, simulation_uuid):
         self.retry(exc=exc)
 
 
-@app.task
-def clean_simulations():
+@shared_task
+def download_icon_weather_data():
     """
-    Clean old simulations
+    Download EU ICON wind data for all forecast times.
     """
-    print("Cleaning old simulation data.")
-    for simulation in apps.get_model(
-        app_label="leeway", model_name="LeewaySimulation"
-    ).objects.filter(timezone.now() - timedelta(days=settings.SIMULATION_RETENTION)):
-        print(f"Removed simulation {simulation.uuid}.")
-        if simulation.img:
-            simulation.img.delete()
-        if simulation.netcdf:
-            simulation.netcdf.delete()
-        simulation.delete()
+    frts = ["00", "03", "06", "09", "12", "15", "18", "21"]
+    for frt in frts:
+        download_and_merge(frt)
+    logger.info("EU ICON weather data download completed.")

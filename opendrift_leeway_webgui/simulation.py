@@ -35,16 +35,11 @@ from opendrift.readers.reader_netCDF_CF_generic import Reader
 INPUTDIR = "/tmp/code/leeway/input"
 
 
-# pylint: disable=too-many-locals, too-many-statements, too-many-branches
-def main():
+def main():  # noqa: C901
     """Run opendrift leeway simulation"""
     parser = argparse.ArgumentParser(description="Simulate drift of object")
-    parser.add_argument(
-        "--longitude", help="Start longitude of the drifting object", type=float
-    )
-    parser.add_argument(
-        "--latitude", help="Start latitude of the drifting object", type=float
-    )
+    parser.add_argument("--longitude", help="Start longitude of the drifting object", type=float)
+    parser.add_argument("--latitude", help="Start latitude of the drifting object", type=float)
     parser.add_argument(
         "--start-time",
         help="Starting time (YYYY-MM-DD HH:MM) of the simulation. Default: Now",
@@ -65,21 +60,14 @@ def main():
         type=int,
         default=27,
     )
-    parser.add_argument(
-        "--number", help="Number of drifters simulated.", type=int, default=100
-    )
+    parser.add_argument("--number", help="Number of drifters simulated.", type=int, default=100)
     parser.add_argument(
         "--radius",
-        help=(
-            "Radius for distributing drifting particles around the start coordinates "
-            "in meters."
-        ),
+        help=("Radius for distributing drifting particles around the start coordinates in meters."),
         type=int,
         default=1000,
     )
-    parser.add_argument(
-        "--id", help="ID used for result image name.", default=str(uuid.uuid4())
-    )
+    parser.add_argument("--id", help="ID used for result image name.", default=str(uuid.uuid4()))
     parser.add_argument(
         "--no-web",
         help="Disable fetching simulation data from web.",
@@ -92,14 +80,10 @@ def main():
     simulation = Leeway(loglevel=50)
 
     local_sources = [
-        os.path.join(INPUTDIR, data_file)
-        for data_file in os.listdir(INPUTDIR)
-        if data_file.endswith(".nc")
+        os.path.join(INPUTDIR, data_file) for data_file in os.listdir(INPUTDIR) if data_file.endswith(".nc")
     ]
     sources = []
-    if local_sources:
-        sources += local_sources
-    elif not args.no_web:
+    if not args.no_web:
         if os.environ.get("COPERNICUSMARINE_SERVICE_USERNAME") not in (
             None,
             "",
@@ -111,15 +95,11 @@ def main():
                 "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i",
                 "cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H",
             ]
-            print(
-                "Using CMEMS datasets:\n - {}".format("\n - ".join(cmems_dataset_ids))
-            )
+            print("Using CMEMS datasets:\n - {}".format("\n - ".join(cmems_dataset_ids)))
             readers = []
             for dataset_id in cmems_dataset_ids:
                 try:
-                    ds = copernicusmarine.open_dataset(
-                        dataset_id=dataset_id, chunk_size_limit=0
-                    )
+                    ds = copernicusmarine.open_dataset(dataset_id=dataset_id, chunk_size_limit=0)
                     print(f"Opened {dataset_id}:")
                     print(ds)
                 except Exception as exc:
@@ -127,14 +107,19 @@ def main():
                     raise
                 readers.append(Reader(ds, name=dataset_id))
             simulation.add_reader(readers)
-            sources += [
-                "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd"
-            ]
+            if not local_sources:
+                sources += [
+                    "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd"
+                ]
         else:
             sources += [
                 "https://tds.hycom.org/thredds/dodsC/FMRC_ESPC-D-V02_uv3z/FMRC_ESPC-D-V02_uv3z_best.ncd",
-                "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
             ]
+            if not local_sources:
+                sources += [
+                    "https://pae-paha.pacioos.hawaii.edu/thredds/dodsC/ncep_global/NCEP_Global_Atmospheric_Model_best.ncd",
+                ]
+    sources += local_sources
     print("Using sources:\n - {}".format("\n - ".join(sources)))
     simulation.add_readers_from_list(sources, lazy=False)
 
@@ -152,9 +137,7 @@ def main():
 
     outfile = os.path.join("/tmp/code", "leeway", "output", args.id)
 
-    ds = simulation.run(
-        duration=timedelta(hours=args.duration), time_step=600, outfile=f"{outfile}.nc"
-    )
+    ds = simulation.run(duration=timedelta(hours=args.duration), time_step=600, outfile=f"{outfile}.nc")
 
     # Plotting results
     lon = ds["lon"].values
@@ -162,10 +145,7 @@ def main():
     lon[lon == 0] = np.nan
     lat[lat == 0] = np.nan
 
-    segments = [
-        [(float(lo), float(la)) for lo, la in zip(lon_row, lat_row)]
-        for lon_row, lat_row in zip(lon, lat)
-    ]
+    segments = [[(float(lo), float(la)) for lo, la in zip(lon_row, lat_row)] for lon_row, lat_row in zip(lon, lat)]
 
     geojson = segments_to_geojson(segments)
 
@@ -184,19 +164,13 @@ def main():
     stranded = None
     active = None
     for i in range(lon.shape[0]):
-        lon_max_idx = (
-            np.where(np.isnan(lon[i, ...]))[0][0] - 1 if np.isnan(lon[i, -1]) else -1
-        )
-        lat_max_idx = (
-            np.where(np.isnan(lat[i, ...]))[0][0] - 1 if np.isnan(lat[i, -1]) else -1
-        )
+        lon_max_idx = np.where(np.isnan(lon[i, ...]))[0][0] - 1 if np.isnan(lon[i, -1]) else -1
+        lat_max_idx = np.where(np.isnan(lat[i, ...]))[0][0] - 1 if np.isnan(lat[i, -1]) else -1
 
         points = np.array([lon[i, ...], lat[i, ...]]).T.reshape(-1, 1, 2)
         segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
-        lc = LineCollection(
-            segments, cmap="jet", norm=plt.Normalize(0, args.duration), transform=gcrs
-        )
+        lc = LineCollection(segments, cmap="jet", norm=plt.Normalize(0, args.duration), transform=gcrs)
         lc.set_array(np.linspace(0, args.duration, len(segments)))
         lc.set_linewidth(2)
         line = ax.add_collection(lc)
@@ -300,9 +274,7 @@ def main():
         dms=True, auto_hide=False, number_format=".0f", seconds_number_format=".0f"
     )
 
-    gl = ax.gridlines(
-        draw_labels=True, linewidth=1, color="gray", alpha=0.5, rotate_labels=True
-    )
+    gl = ax.gridlines(draw_labels=True, linewidth=1, color="gray", alpha=0.5, rotate_labels=True)
     gl.ylocator = yloc
     gl.xlocator = xloc
     # Labels on bottom and right only (set both old and new cartopy attribute names)
@@ -321,13 +293,9 @@ def main():
 
     if len(zebra_x) > 200 or len(zebra_y) > 200:
         x_step_div = 2
-        zebra_x = np.arange(
-            extent[0], extent[1] + x_step / x_step_div, x_step / x_step_div
-        )
+        zebra_x = np.arange(extent[0], extent[1] + x_step / x_step_div, x_step / x_step_div)
         y_step_div = 2
-        zebra_y = np.arange(
-            extent[2], extent[3] + y_step / y_step_div, y_step / y_step_div
-        )
+        zebra_y = np.arange(extent[2], extent[3] + y_step / y_step_div, y_step / y_step_div)
 
     points = np.array([zebra_x, np.zeros_like(zebra_x) + extent[2]]).T.reshape(-1, 1, 2)
     lc = get_zebra_line(points, gcrs)
@@ -408,10 +376,7 @@ def segments_to_geojson(segments):
     Returns:
         dict: GeoJSON GeometryCollection
     """
-    geometries = [
-        {"type": "LineString", "coordinates": [list(point) for point in line]}
-        for line in segments
-    ]
+    geometries = [{"type": "LineString", "coordinates": [list(point) for point in line]} for line in segments]
 
     return {"type": "GeometryCollection", "geometries": geometries}
 

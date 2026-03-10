@@ -21,12 +21,16 @@ def test_simulation(admin_client, settings, celery_worker, uuid_store):
     response = admin_client.post(
         form,
         data={
-            "latitude": "33°58'44.3\"",
-            "longitude": "11°21'13.4\"",
+            "latitude_deg": "33",
+            "latitude_min": "58",
+            "latitude_sec": "44.3",
+            "latitude_dir": "N",
+            "longitude_deg": "11",
+            "longitude_min": "21",
+            "longitude_sec": "13.4",
+            "longitude_dir": "E",
             "object_type": 27,
-            "start_time": (datetime.now() - timedelta(hours=36)).strftime(
-                "%Y-%m-%d %H:%M"
-            ),
+            "start_time": (datetime.now() - timedelta(hours=36)).strftime("%Y-%m-%d %H:%M"),
             "duration": 2,
             "radius": 1000,
         },
@@ -75,10 +79,7 @@ def _teardown_test_simulation(uuid, settings):
     assert result_email.cc == []
     assert result_email.reply_to == []
     assert result_email.subject == "Leeway Drift Simulation Result"
-    assert (
-        f"Your request with ID {uuid} has been processed. Find the image attached."
-        in result_email.body
-    )
+    assert f"Your request with ID {uuid} has been processed. Find the image attached." in result_email.body
     assert len(result_email.attachments) == 1
     # pylint: disable=unused-variable
     filename, content, mimetype = result_email.attachments[0]

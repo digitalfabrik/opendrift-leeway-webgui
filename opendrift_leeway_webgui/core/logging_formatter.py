@@ -54,9 +54,7 @@ class RequestFormatter(logging.Formatter):
         # Check whether this record belongs to a request
         if record.name == "django.request":
             # Prepend HTTP status code to the message
-            message = message.replace(
-                "django.request - ", f"django.request - {record.status_code} "
-            )
+            message = message.replace("django.request - ", f"django.request - {record.status_code} ")
             # Append the GET query string to the message
             if query := record.request.META["QUERY_STRING"]:
                 if "\n" in message:
