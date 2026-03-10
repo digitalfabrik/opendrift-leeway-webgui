@@ -137,10 +137,7 @@ class LeewaySimulationForm(ModelForm):
         ]
         help_texts = {
             "duration": "Length of simulation in hours.",
-            "radius": (
-                "Radius for distributing drifting particles around "
-                "the start coordinates in meters."
-            ),
+            "radius": ("Radius for distributing drifting particles around the start coordinates in meters."),
             "start_time": "All times are UTC. Only simulations +/- 5 days from now are possible.",
         }
 
@@ -167,9 +164,7 @@ class LeewaySimulationForm(ModelForm):
         decimal_value = _assemble_decimal(deg, minutes, sec)
 
         if decimal_value > max_deg:
-            raise ValidationError(
-                f"Value {decimal_value} exceeds the maximum of {max_deg}°."
-            )
+            raise ValidationError(f"Value {decimal_value} exceeds the maximum of {max_deg}°.")
 
         if direction in ("S", "W"):
             decimal_value = -decimal_value

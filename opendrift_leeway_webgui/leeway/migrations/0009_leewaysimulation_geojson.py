@@ -6,7 +6,6 @@ import opendrift_leeway_webgui.leeway.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("leeway", "0008_leewaysimulation_traceback")]
 
     operations = [

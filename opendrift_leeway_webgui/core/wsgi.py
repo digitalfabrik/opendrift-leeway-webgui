@@ -26,9 +26,7 @@ def application(environ, start_response):
     :return: The WSGI callable
     :rtype: ~django.core.handlers.WSGIHandler
     """
-    os.environ.setdefault(
-        "DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings"
-    )
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings")
 
     # Read config from config file
     config = configparser.ConfigParser(interpolation=None)

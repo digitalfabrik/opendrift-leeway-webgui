@@ -105,9 +105,7 @@ WSGI_APPLICATION = "opendrift_leeway_webgui.core.wsgi.application"
 #: The list of validators that are used to check the strength of user’s passwords
 #: (see :setting:`django:AUTH_PASSWORD_VALIDATORS` and :ref:`django:password-validation`)
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -126,9 +124,7 @@ LOGOUT_REDIRECT_URL = "login"
 
 #: A dictionary containing the settings for all databases to be used with this Django installation
 #: (see :setting:`django:DATABASES`)
-DATABASES = {
-    "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}
-}
+DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
 
 #: Default primary key field type to use for models that don’t have a field with
 #: :attr:`primary_key=True <django.db.models.Field.primary_key>`. (see :setting:`django:DEFAULT_AUTO_FIELD`)
@@ -177,12 +173,16 @@ STATIC_ROOT = os.environ.get("LEEWAY_STATIC_ROOT")
 SIMULATION_URL = "/simulation-files/"
 
 #: The path where simulation results are stored
-SIMULATION_ROOT = os.environ.get(
-    "LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR, "simulation-files")
-)
+SIMULATION_ROOT = os.environ.get("LEEWAY_SIMULATION_ROOT", os.path.join(BASE_DIR, "simulation-files"))
 
 #: The output path of simulation results
 SIMULATION_OUTPUT = os.path.join(SIMULATION_ROOT, "output")
+
+#: The path where ICON weather data is stored
+ICON_DATA_PATH = os.path.join(SIMULATION_ROOT, "input", "ICON_EU_120.nc")
+
+#: Maximum number of workers for ICON data download
+ICON_MAX_WORKERS = int(os.environ.get("LEEWAY_ICON_MAX_WORKERS", 4))
 
 #: Number of days for keeping simulations and results.
 SIMULATION_RETENTION = int(os.environ.get("LEEWAY_SIMULATION_RETENTION", 7))
@@ -202,9 +202,7 @@ SYS_LOG_LEVEL = "INFO"
 DEPS_LOG_LEVEL = os.environ.get("LEEWAY_DEPS_LOG_LEVEL", "INFO" if DEBUG else "WARN")
 
 #: The file path of the logfile. Needs to be writable by the application.
-LOGFILE = os.environ.get(
-    "LEEWAY_LOGFILE", os.path.join(BASE_DIR, "opendrift-leeway-webgui.log")
-)
+LOGFILE = os.environ.get("LEEWAY_LOGFILE", os.path.join(BASE_DIR, "opendrift-leeway-webgui.log"))
 
 #: Logging configuration dictionary (see :setting:`django:LOGGING`)
 LOGGING = {
@@ -350,9 +348,7 @@ EMAIL_HOST = os.environ.get("LEEWAY_EMAIL_HOST", "localhost")
 EMAIL_HOST_PASSWORD = os.environ.get("LEEWAY_EMAIL_HOST_PASSWORD")
 
 if EMAIL_HOST_PASSWORD and not SERVER_EMAIL:
-    raise ImproperlyConfigured(
-        "You have set an `EMAIL_HOST_PASSWORD`, but `SERVER_EMAIL` is missing."
-    )
+    raise ImproperlyConfigured("You have set an `EMAIL_HOST_PASSWORD`, but `SERVER_EMAIL` is missing.")
 
 #: Username to use for the SMTP server defined in :attr:`~LEEWAY.core.settings.EMAIL_HOST`
 #: (see :setting:`django:EMAIL_HOST_USER`). If empty, Django won’t attempt authentication.
@@ -372,9 +368,5 @@ EMAIL_USE_TLS = bool(strtobool(os.environ.get("LEEWAY_EMAIL_USE_TLS", "True")))
 #: (see :setting:`django:EMAIL_USE_SSL`)
 EMAIL_USE_SSL = bool(strtobool(os.environ.get("LEEWAY_EMAIL_USE_SSL", "False")))
 
-COPERNICUSMARINE_SERVICE_USERNAME = os.environ.get(
-    "LEEWAY_COPERNICUSMARINE_SERVICE_USERNAME"
-)
-COPERNICUSMARINE_SERVICE_PASSWORD = os.environ.get(
-    "LEEWAY_COPERNICUSMARINE_SERVICE_PASSWORD"
-)
+COPERNICUSMARINE_SERVICE_USERNAME = os.environ.get("LEEWAY_COPERNICUSMARINE_SERVICE_USERNAME")
+COPERNICUSMARINE_SERVICE_PASSWORD = os.environ.get("LEEWAY_COPERNICUSMARINE_SERVICE_PASSWORD")

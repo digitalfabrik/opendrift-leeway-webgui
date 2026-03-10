@@ -7,17 +7,16 @@ import email
 import os
 from imaplib import IMAP4_SSL
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings")
+
 from celery import Celery
 from django.conf import settings
 
 from .utils import mail_to_simulation
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings")
 app = Celery("leeway")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "opendrift_leeway_webgui.core.settings")
 
 # Read config from config file
 config = configparser.ConfigParser(interpolation=None)
@@ -31,8 +30,12 @@ for section in config.sections():
 def setup_periodic_tasks(sender, **kwargs):
     """
     Set up periodic tasks, i.e. retrieving mails from the mailbox
+    and downloading weather data.
     """
+    from .tasks import download_icon_weather_data  # pylint: disable=import-outside-toplevel
+
     sender.add_periodic_task(60, check_mailbox.s(), name="check_mailbox")
+    sender.add_periodic_task(10800, download_icon_weather_data.s(), name="download_icon_weather")
 
 
 @app.task
