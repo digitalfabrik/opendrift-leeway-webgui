@@ -121,3 +121,12 @@ class Webhook(models.Model):
 
     class Meta:
         app_label = "leeway"
+
+class IconFiles(models.Model):
+    """
+    A model to store file names of the last downloads of the ICON-EU model
+    """
+
+    frt = models.CharField(max_length=2, verbose_name=_("Forecast time"))
+    file_name = models.CharField(max_length=127, verbose_name=_("File name of downloaded file"))
+    download_date__lt = models.DateTimeField(auto_now_add=True)

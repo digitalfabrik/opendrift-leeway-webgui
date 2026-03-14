@@ -9,6 +9,7 @@ import re
 import tempfile
 import json
 import requests
+from datetime import datetime, timedelta
 
 import numpy as np
 import xarray as xr
@@ -18,7 +19,7 @@ from pathlib import Path
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMessage, send_mail#
 from dms2dec.dms_convert import dms2dec
 
 
@@ -252,8 +253,7 @@ def normalize_dms2dec(data):
         return dms2dec(data)
     return data
 
-
-### Download ICON EU wind data
+### Download ICON EU wind data for opendrift
 
 def _list_bz2_files(url: str) -> list[str]:
     """Fetch the DWD directory listing and return all sorted .bz2 filenames."""
@@ -363,84 +363,105 @@ def _merge_netCDF(big_file:str, new_ds, cutoff_hours=None):
     os.rename(f"{big_file}.PART", big_file)
 
 
+def download_and_merge(frt, max_workers : int, output_file : str = "opendrift_leeway_webgui/simulation-files/input/ICON_EU_120.netcdf", cutoff_hours : int = 120):
+    
+    """
+    1. Download ICON-EU 10 m wind data (U/V components) from DWD OpenData
+    2. Unpack bz2 GRIB2 files in parallel
+    3. merge u and v component
+    4. make compatible with OpenDrift's GenericModelReader.
+    5. merge into a single NetCDF file, keep everything until cutoff_hours
 
-def download_and_merge(last_downloads_file, max_workers : int, output_file : str = None, cutoff_hours : int = 120):
+    Parameters:
+        frt: str
+            Forecast time of the ICON-EU model run. [00, 03, 06, 09, 12, 15, 18, 21]
+        max_workers: int
+            Number of parallel download workers
+        output_file: str
+            Existing netCDF file
+        cutoff_hours: int
+            Data that is older than cutoff_hours will be deleted
+    Returns:
+        xr.Dataset
+            The merged NetCDF file
+    """
+    if frt not in ["00", "03", "06", "09", "12", "15", "18", "21"]:
+        raise ValueError(f"Invalid frt: {frt}")
+    
+    IconFiles = apps.get_model(app_label="leeway", model_name="IconFiles")
+    last_downloads = IconFiles.objects.filter(frt=frt).values_list("file_name", flat=True)
 
-    last_downloads = load_previous_downloads(last_downloads_file)  
-          
-    for frt in last_downloads.keys(): #frt = forecast time
-        print(f"looking up {frt}")
-        BASE_URL_U = f"https://opendata.dwd.de/weather/nwp/icon-eu/grib/{frt}/u_10m/"
-        BASE_URL_V = f"https://opendata.dwd.de/weather/nwp/icon-eu/grib/{frt}/v_10m/"
+    BASE_URL_U = f"https://opendata.dwd.de/weather/nwp/icon-eu/grib/{frt}/u_10m/"
+    BASE_URL_V = f"https://opendata.dwd.de/weather/nwp/icon-eu/grib/{frt}/v_10m/"
 
-        # Download and merge U and V components
-        print("Listing available files …")
-        u_files = _list_bz2_files(BASE_URL_U)
-        v_files = _list_bz2_files(BASE_URL_V)
+    # Download and merge U and V components
+    print("Listing available files …")
+    u_files = _list_bz2_files(BASE_URL_U)
+    v_files = _list_bz2_files(BASE_URL_V)
 
-        if u_files is None or v_files is None:
-            print("No files found.")
-            continue
+    if u_files is None or v_files is None:
+        print("No files found.")
+        return None
 
-        if sorted([*u_files,*v_files]) == last_downloads[frt]:
-            print(f"{frt} already downloaded.")
-            continue
-        
-        last_downloads[frt] = sorted([*u_files,*v_files])
+    if sorted([*u_files,*v_files]) == sorted(last_downloads):
+        print(f"{frt} already downloaded.")
+        return None
+    
+    print(f"  U files: {len(u_files)}   V files: {len(v_files)}")
+    print(f"\nDownloading in parallel with {max_workers} workers")
 
-        print(f"  U files: {len(u_files)}   V files: {len(v_files)}")
-        print(f"\nDownloading in parallel with {max_workers} workers")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmp = Path(tmpdir)
+        # Build task lists: (url, destination_path)
+        u_tasks = [(BASE_URL_U + f, tmp / f.replace(".bz2", "")) for f in u_files]
+        v_tasks = [(BASE_URL_V + f, tmp / f.replace(".bz2", "")) for f in v_files]
 
-            # Build task lists: (url, destination_path)
-            u_tasks = [(BASE_URL_U + f, tmp / f.replace(".bz2", "")) for f in u_files]
-            v_tasks = [(BASE_URL_V + f, tmp / f.replace(".bz2", "")) for f in v_files]
+        u_gribs = _parallel_download( u_tasks, max_workers=max_workers)
+        v_gribs = _parallel_download( v_tasks, max_workers=max_workers)
 
-            u_gribs = _parallel_download( u_tasks, max_workers=max_workers)
-            v_gribs = _parallel_download( v_tasks, max_workers=max_workers)
+        print("\nLoading GRIB2 files into xarray …")
+        ds_u = xr.open_mfdataset(
+            u_gribs,
+            engine="cfgrib",
+            combine="nested",
+            concat_dim="valid_time",
+            coords='different',
+            compat='no_conflicts',
+            join="outer",
+            parallel=True,
+            backend_kwargs={"errors": "ignore"},
+        )
+        ds_v = xr.open_mfdataset(
+            v_gribs,
+            engine="cfgrib",
+            combine="nested",
+            concat_dim="valid_time",
+            coords='different',
+            compat='no_conflicts',
+            join="outer",
+            parallel=True,
+            backend_kwargs={"errors": "ignore"},
+        )
 
-            print("\nLoading GRIB2 files into xarray …")
-            ds_u = xr.open_mfdataset(
-                u_gribs,
-                engine="cfgrib",
-                combine="nested",
-                concat_dim="valid_time",
-                coords='different',
-                compat='no_conflicts',
-                join="outer",
-                parallel=True,
-                backend_kwargs={"errors": "ignore"},
-            )
-            ds_v = xr.open_mfdataset(
-                v_gribs,
-                engine="cfgrib",
-                combine="nested",
-                concat_dim="valid_time",
-                coords='different',
-                compat='no_conflicts',
-                join="outer",
-                parallel=True,
-                backend_kwargs={"errors": "ignore"},
-            )
+        # Drop scalar coords that differ between timesteps to avoid merge conflicts
+        keep = {"valid_time", "latitude", "longitude"}
+        ds_u = ds_u.drop_vars([c for c in ds_u.coords if c not in keep], errors="ignore")
+        ds_v = ds_v.drop_vars([c for c in ds_v.coords if c not in keep], errors="ignore")
 
-            # Drop scalar coords that differ between timesteps to avoid merge conflicts
-            keep = {"valid_time", "latitude", "longitude"}
-            ds_u = ds_u.drop_vars([c for c in ds_u.coords if c not in keep], errors="ignore")
-            ds_v = ds_v.drop_vars([c for c in ds_v.coords if c not in keep], errors="ignore")
+        ds = xr.merge([ds_u, ds_v],join="outer")
 
-            ds = xr.merge([ds_u, ds_v],join="outer")
+        print("\nRenaming variables for OpenDrift compatibility …")
+        ds = _rename_for_opendrift(ds)
 
-            print("\nRenaming variables for OpenDrift compatibility …")
-            ds = _rename_for_opendrift(ds)
-
-            if output_file:
-                if os.path.exists(output_file):
-                    _merge_netCDF(output_file, ds, cutoff_hours)
-                else:
-                    ds.to_netcdf(output_file)
-                with open(last_downloads_file, "w") as f:
-                    json.dump(last_downloads, f)
-            print("exiting temp file.")
-    print("\nDone.")
+        if output_file:
+            if os.path.exists(output_file):
+                _merge_netCDF(output_file, ds, cutoff_hours)
+            else:
+                ds.to_netcdf(output_file)
+        for f in u_files:
+            IconFiles(frt=frt, file_name=f, download_date=datetime.now()).save()
+        for f in v_files:
+            IconFiles(frt=frt, file_name=f, download_date=datetime.now()).save()
+        IconFiles.objects.filter(download_date__lt=datetime.now()-datetime.timedelta(h=23)).delete()
+    return ds
