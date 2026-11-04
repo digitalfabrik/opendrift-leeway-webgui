@@ -24,6 +24,7 @@
                         <a href="{% url 'webhook_list' %}">Webhooks</a>
                         <a href="{% url 'simulation_documentation' %}">Documentation</a>
                         <a href="https://github.com/digitalfabrik/opendrift-leeway-webgui">Source Code</a>
+                        <a href="{% url 'password_change' %}">Change Password</a>
                         <form method="post" action="{% url 'logout' %}" class="logout-form">
                             {% csrf_token %}
                             <button type="submit">Logout</button>
