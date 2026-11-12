@@ -16,7 +16,8 @@
             <tr>
                 <td>{{ simulation.name|default:simulation.uuid }}</td>
                 <td>
-                    <span class="truncate" title="{{ simulation.get_object_type_display }}">{{ simulation.get_object_type_display }}</span>
+                    <span class="truncate"
+                          title="{{ simulation.get_object_type_display }}">{{ simulation.get_object_type_display }}</span>
                 </td>
                 <td>{{ simulation.longitude|floatformat:4 }}</td>
                 <td>{{ simulation.latitude|floatformat:4 }}</td>
