@@ -311,7 +311,21 @@ REST_FRAMEWORK = {
 #: The configuration for the API documentation by drf-spectacular
 SPECTACULAR_SETTINGS = {
     "TITLE": "Opendrift Leeway Webgui API",
-    "DESCRIPTION": "The API documentation for the Opendrift Leeway Webgui",
+    "DESCRIPTION": (
+        "The API documentation for the Opendrift Leeway Webgui\n\n"
+        "## Authentication\n\n"
+        "1. Obtain a token by sending a `POST` request to `/api/v1/auth/login/` "
+        "with your username and password via HTTP Basic authentication, e.g. "
+        "`curl -X POST -u username:password https://leeway.tuerantuer.org/api/v1/auth/login/`\n"
+        "2. Send the returned token with every request in the header "
+        "`Authorization: Token <token>`\n"
+        "3. Invalidate the token with a `POST` request to `/api/v1/auth/logout/` "
+        "(or all your tokens via `/api/v1/auth/logoutall/`)\n\n"
+        "In this documentation, click *Authorize*, enter your credentials under "
+        "*basicAuth* to call the login endpoint, then enter `Token <token>` "
+        "under *knoxApiToken*.\n\n"
+        "Alternatively, an existing session cookie from the web login is accepted."
+    ),
     "VERSION": None,
     "SCHEMA_PATH_PREFIX": "/api(/v[0-9])?",
     "CONTACT": {"email": "tech@integreat-app.de"},

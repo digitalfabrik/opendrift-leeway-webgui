@@ -18,6 +18,7 @@ router.register("simulations", views.LeewaySimulationViewSet, "simulations")
 #: The url patterns of this module (see :doc:`django:topics/http/urls`)
 urlpatterns = [
     path("", include(router.urls)),
+    path("auth/login/", views.LoginView.as_view(), name="knox_login"),
     path("auth/", include("knox.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(

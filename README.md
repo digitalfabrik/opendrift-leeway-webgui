@@ -26,7 +26,11 @@ API documentation can be found at: https://leeway.tuerantuer.org/api/docs/
 
 Authentication can be provided in two ways:
 1. Via your session cookie, obtained from the normal login
-2. Via an authentication token, can be obtained via [/api/auth/login/](https://leeway.tuerantuer.org/api/v1/docs/#/auth/auth_login_create)
+2. Via an authentication token, can be obtained via [/api/v1/auth/login/](https://leeway.tuerantuer.org/api/v1/docs/#/auth/auth_login_create) using HTTP Basic authentication:
+   ```bash
+   curl -X POST -u username:password https://leeway.tuerantuer.org/api/v1/auth/login/
+   ```
+   Send the returned token in the header `Authorization: Token <token>` with subsequent requests.
 
 # Installation
 
